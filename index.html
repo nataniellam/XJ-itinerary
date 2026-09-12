@@ -456,7 +456,7 @@ function fetchLiveWeather(){
   });
 }
 
-let map, directionsService, detourLine, detourMarker;
+let map, directionsService, detourMarker;
 const MARKERS = {};
 const DAY_RENDERERS = {};
 const DAY_BOUNDS = {};
@@ -490,12 +490,6 @@ window.initMap = function(){
     fullscreenControl: true,
   });
   directionsService = new google.maps.DirectionsService();
-
-  detourLine = new google.maps.Polyline({
-    path: [], strokeOpacity: 0, strokeColor: COLOR_DETOUR,
-    icons: [{ icon: { path: "M 0,-1 0,1", strokeOpacity: 1, scale: 2.5 }, offset: "0", repeat: "10px" }],
-    map,
-  });
 
   const bounds = new google.maps.LatLngBounds();
   Object.entries(STOPS).forEach(([id, s]) => {
@@ -654,11 +648,8 @@ function selectDay(day, scrollToStop){
     if (data.detour) {
       detourMarker.setMap(map);
       detourMarker.setPosition({ lat: data.detour.lat, lng: data.detour.lng });
-      detourLine.setPath([STOPS[data.detour.anchor], { lat: data.detour.lat, lng: data.detour.lng }]);
-      detourLine.setMap(map);
     } else {
       detourMarker.setMap(null);
-      detourLine.setMap(null);
     }
 
     fitDayBounds(day);
