@@ -478,7 +478,15 @@ function applyRouteStyle(day){
   const style = active
     ? { strokeColor: COLOR_ACTIVE, strokeOpacity: 0.95, strokeWeight: 5 }
     : { strokeColor: COLOR_MUTED, strokeOpacity: 0.6, strokeWeight: 3 };
-  entry.isDirections ? entry.obj.setOptions({ polylineOptions: style }) : entry.obj.setOptions(style);
+  if (entry.isDirections) {
+    entry.obj.setOptions({ polylineOptions: style });
+    // DirectionsRenderer doesn't repaint an already-drawn route just because
+    // polylineOptions changed — re-applying the same result forces a redraw.
+    const current = entry.obj.getDirections();
+    if (current) entry.obj.setDirections(current);
+  } else {
+    entry.obj.setOptions(style);
+  }
 }
 
 function fitDayBounds(day){
