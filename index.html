@@ -1,0 +1,520 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Junggar Loop</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<style>
+:root{
+  --bg:#f4efe3;
+  --surface:#ffffff;
+  --surface-2:#ece2cc;
+  --ink:#241f18;
+  --ink-dim:#766c59;
+  --line:#ddd0b0;
+  --accent-gold:#a8721c;
+  --accent-teal:#1f7a72;
+  --accent-teal-bright:#0e8e83;
+  --route-muted:#c7b489;
+  --shadow:0 1px 2px rgba(36,31,24,.06), 0 8px 24px rgba(36,31,24,.08);
+  --chip-bg:#f1e8d4;
+  --warn-bg:#fbe6c8;
+  --warn-ink:#5c3a10;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#12161d; --surface:#191f28; --surface-2:#212933; --ink:#eae4d4; --ink-dim:#96917f;
+    --line:#2c3540; --accent-gold:#dda956; --accent-teal:#3fb8ac; --accent-teal-bright:#57e0d1;
+    --route-muted:#3c4552; --shadow:0 1px 2px rgba(0,0,0,.3), 0 12px 28px rgba(0,0,0,.45);
+    --chip-bg:#232b35; --warn-bg:#3a2c15; --warn-ink:#f0c98a;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#12161d; --surface:#191f28; --surface-2:#212933; --ink:#eae4d4; --ink-dim:#96917f;
+  --line:#2c3540; --accent-gold:#dda956; --accent-teal:#3fb8ac; --accent-teal-bright:#57e0d1;
+  --route-muted:#3c4552; --shadow:0 1px 2px rgba(0,0,0,.3), 0 12px 28px rgba(0,0,0,.45);
+  --chip-bg:#232b35; --warn-bg:#3a2c15; --warn-ink:#f0c98a;
+}
+
+*{box-sizing:border-box;}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:'Inter',system-ui,sans-serif;-webkit-font-smoothing:antialiased;}
+.page{max-width:1240px;margin:0 auto;padding:28px 20px 64px;}
+
+header.top{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:16px;margin-bottom:22px;}
+.eyebrow{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent-gold);font-weight:500;margin:0 0 6px;}
+h1{font-family:'Fraunces',serif;font-weight:600;font-size:clamp(28px,4vw,42px);margin:0;text-wrap:balance;letter-spacing:-.01em;}
+.top p.sub{margin:6px 0 0;color:var(--ink-dim);font-size:14.5px;max-width:52ch;}
+.legend{display:flex;gap:18px;flex-wrap:wrap;font-size:12.5px;color:var(--ink-dim);}
+.legend .item{display:flex;align-items:center;gap:7px;white-space:nowrap;}
+.legend .swatch{width:18px;height:0;border-top:3px solid;border-radius:2px;}
+.legend .swatch.muted{border-top-style:dotted;border-top-color:var(--route-muted);border-top-width:3px;}
+.legend .swatch.active{border-top-color:var(--accent-teal-bright);}
+.legend .diamond{width:9px;height:9px;background:var(--accent-gold);transform:rotate(45deg);border-radius:2px;flex:0 0 auto;}
+
+.key-banner{
+  display:none;
+  background:var(--warn-bg);color:var(--warn-ink);
+  border:1px solid var(--accent-gold);border-radius:12px;
+  padding:14px 16px;margin-bottom:18px;font-size:13.5px;line-height:1.6;
+}
+.key-banner.show{display:block;}
+.key-banner code{background:rgba(0,0,0,.12);padding:1px 6px;border-radius:5px;font-family:'JetBrains Mono',monospace;font-size:12.5px;}
+.key-banner a{color:inherit;}
+
+.day-strip{position:sticky;top:0;z-index:5;background:var(--bg);padding:14px 0 10px;margin-bottom:18px;border-bottom:1px solid var(--line);}
+.day-scroll{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;scrollbar-width:thin;}
+.day-scroll::-webkit-scrollbar{height:6px;}
+.day-scroll::-webkit-scrollbar-thumb{background:var(--line);border-radius:4px;}
+.day-btn{flex:0 0 auto;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:10px;padding:8px 14px;cursor:pointer;font-family:'JetBrains Mono',monospace;font-size:12.5px;text-align:left;line-height:1.35;transition:border-color .15s, background .15s;}
+.day-btn span.d{display:block;color:var(--ink-dim);font-size:10.5px;letter-spacing:.06em;}
+.day-btn span.t{display:block;color:var(--ink);font-family:'Inter',sans-serif;font-size:12.5px;font-weight:600;margin-top:1px;}
+.day-btn:hover{border-color:var(--accent-teal-bright);}
+.day-btn.active{background:var(--accent-teal-bright);border-color:var(--accent-teal-bright);}
+.day-btn.active span.d, .day-btn.active span.t{color:#06201d;}
+
+.trip-grid{display:grid;grid-template-columns:minmax(320px,480px) 1fr;gap:22px;align-items:start;}
+@media (max-width:900px){.trip-grid{grid-template-columns:1fr;}}
+
+.map-panel{position:sticky;top:78px;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:18px 18px 14px;box-shadow:var(--shadow);}
+@media (max-width:900px){.map-panel{position:static;}}
+
+.route-label-row{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap;}
+.route-label{font-size:13px;color:var(--ink-dim);margin:0 0 2px;}
+.route-label b{color:var(--ink);font-weight:600;}
+.route-title{font-family:'Fraunces',serif;font-weight:600;font-size:19px;margin:0 0 10px;text-wrap:balance;}
+.maplink{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--accent-teal-bright);text-decoration:none;border-bottom:1px dotted var(--accent-teal-bright);white-space:nowrap;}
+.maplink:hover{opacity:.75;}
+
+#map{width:100%;height:440px;border-radius:10px;margin-top:8px;background:var(--surface-2);}
+
+.detour-box{margin-top:14px;background:var(--chip-bg);border:1px dashed var(--accent-gold);border-radius:12px;padding:12px 14px;}
+.detour-box .row{display:flex;justify-content:space-between;align-items:baseline;gap:8px;}
+.detour-box .k{font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--accent-gold);font-weight:600;margin:0 0 4px;}
+.detour-box .time{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--accent-gold);background:var(--surface);border-radius:100px;padding:2px 9px;white-space:nowrap;}
+.detour-box .name{font-weight:600;font-size:14.5px;margin:6px 0 3px;}
+.detour-box .desc{font-size:13px;color:var(--ink-dim);margin:0 0 8px;line-height:1.5;}
+
+.cards{display:flex;flex-direction:column;gap:16px;}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:20px 22px;box-shadow:var(--shadow);scroll-margin-top:170px;transition:border-color .25s;}
+.card.pulse{border-color:var(--accent-teal-bright);}
+.card-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:4px;}
+.card-name{font-family:'Fraunces',serif;font-size:21px;font-weight:600;margin:0;}
+.tag{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;padding:4px 9px;border-radius:100px;white-space:nowrap;font-weight:600;}
+.tag.start{background:var(--chip-bg);color:var(--accent-gold);}
+.tag.stay{background:var(--accent-teal-bright);color:#06201d;}
+.tag.stop{background:var(--surface-2);color:var(--ink-dim);}
+.tag.end{background:var(--ink);color:var(--surface);}
+.card-desc{font-size:14.5px;color:var(--ink-dim);margin:2px 0 16px;line-height:1.55;max-width:62ch;}
+
+.info-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+@media (max-width:520px){.info-grid{grid-template-columns:1fr;}}
+.block .k{font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-dim);margin:0 0 8px;}
+.temps{display:flex;align-items:baseline;gap:10px;font-family:'JetBrains Mono',monospace;font-variant-numeric:tabular-nums;}
+.temps .hi{font-size:26px;font-weight:700;color:var(--ink);}
+.temps .lo{font-size:15px;color:var(--ink-dim);}
+.cond{font-size:13px;color:var(--ink-dim);margin:6px 0 0;line-height:1.5;}
+.wear-list{display:flex;flex-wrap:wrap;gap:7px;margin:0;padding:0;list-style:none;}
+.wear-list li{background:var(--chip-bg);border-radius:100px;padding:6px 12px;font-size:12.5px;color:var(--ink);line-height:1.3;}
+.card-foot{margin-top:14px;}
+
+footer{margin-top:36px;padding-top:18px;border-top:1px solid var(--line);}
+footer p{font-size:12px;color:var(--ink-dim);line-height:1.6;margin:0 0 6px;max-width:75ch;}
+</style>
+</head>
+<body>
+<div class="page">
+  <header class="top">
+    <div>
+      <p class="eyebrow">Northern Xinjiang &middot; 10-day loop</p>
+      <h1>Junggar Loop</h1>
+      <p class="sub">Urumqi → Altay → Kanas → Sayram Lake → Turpan and back. Route, weather, packing and detour notes for every stop, Oct 6–15.</p>
+    </div>
+    <div class="legend">
+      <span class="item"><span class="swatch muted"></span> full trip</span>
+      <span class="item"><span class="swatch active"></span> selected day</span>
+      <span class="item"><span class="diamond"></span> detour</span>
+    </div>
+  </header>
+
+  <div class="key-banner" id="keyBanner">
+    <strong>Add your Google Maps API key to see the map.</strong>
+    Open this file and replace <code>YOUR_GOOGLE_MAPS_API_KEY</code> near the bottom with a key from the
+    <a href="https://console.cloud.google.com/google/maps-apis/credentials" target="_blank" rel="noopener noreferrer">Google Cloud Console</a>
+    (enable the <strong>Maps JavaScript API</strong>, then restrict the key to your GitHub Pages domain). The rest of the page — day plan, weather, packing, detours — works without it.
+  </div>
+
+  <div class="day-strip">
+    <div class="day-scroll" id="dayScroll"></div>
+  </div>
+
+  <div class="trip-grid">
+    <div class="map-panel">
+      <div class="route-label-row">
+        <p class="route-label" id="routeLabelDay"></p>
+        <a class="maplink" id="routeMapLink" href="#" target="_blank" rel="noopener noreferrer">Open route in Google Maps ↗</a>
+      </div>
+      <p class="route-title" id="routeTitle"></p>
+      <div id="map"></div>
+
+      <div class="detour-box" id="detourBox">
+        <div class="row">
+          <p class="k">Worth the detour</p>
+          <span class="time" id="detourTime"></span>
+        </div>
+        <p class="name" id="detourName"></p>
+        <p class="desc" id="detourDesc"></p>
+        <a class="maplink" id="detourMapLink" href="#" target="_blank" rel="noopener noreferrer">View on Google Maps ↗</a>
+      </div>
+    </div>
+
+    <div class="cards" id="cards"></div>
+  </div>
+
+  <footer>
+    <p><strong>Map:</strong> a live Google Map — pan, zoom and switch to satellite view same as any embedded Google Map. Pins and routes use each stop's real coordinates.</p>
+    <p><strong>Detours:</strong> the gold diamond and dashed line show where a detour sits relative to that day's route; selecting a day zooms the map to fit that day's stops plus the detour, so you can judge the real distance at a glance. Added time is a rough estimate, not a fixed number.</p>
+    <p><strong>Weather:</strong> figures are October seasonal averages for each area (high / low, typical conditions), not a live forecast for your travel dates. Recheck closer to departure, especially for Kanas, Hemu, Baihaba and Sayram Lake, where an early cold snap or first snowfall can shift things fast.</p>
+  </footer>
+</div>
+
+<script>
+const STOPS = {
+  urumqi:      {lat:43.8256, lng:87.6168, label:"Urumqi",        gmaps:"Ürümqi, Xinjiang, China"},
+  jiangjunshan:{lat:47.8500, lng:88.1500, label:"Jiangjunshan",  gmaps:"Jiangjun Mountain, Altay, Xinjiang, China"},
+  altay:       {lat:47.8269, lng:88.1308, label:"Altay",         gmaps:"Altay City, Xinjiang, China"},
+  hemu:        {lat:48.7167, lng:87.0167, label:"Hemu",          gmaps:"Hemu Village, Xinjiang, China"},
+  baihaba:     {lat:48.9500, lng:86.9800, label:"Baihaba",       gmaps:"Baihaba Village, Xinjiang, China"},
+  kanas:       {lat:48.6833, lng:87.0167, label:"Kanas Lake",    gmaps:"Kanas Lake, Xinjiang, China"},
+  sanwan:      {lat:48.5967, lng:87.0167, label:"Sanwan",        gmaps:"Kanas Sanwan Three Bays, Xinjiang, China"},
+  buerjin:     {lat:47.7025, lng:86.8733, label:"Buerjin",       gmaps:"Burqin County, Xinjiang, China"},
+  wuerhe:      {lat:46.2000, lng:85.8000, label:"World Devil City", gmaps:"Wuerhe Ghost City, Karamay, Xinjiang, China"},
+  karamay:     {lat:45.5799, lng:84.8892, label:"Karamay",       gmaps:"Karamay, Xinjiang, China"},
+  dushanzi:    {lat:44.1467, lng:84.7433, label:"Dushanzi",      gmaps:"Dushanzi Grand Canyon, Xinjiang, China"},
+  jinghe:      {lat:44.5978, lng:82.8992, label:"Jinghe",        gmaps:"Jinghe County, Xinjiang, China"},
+  sayram:      {lat:44.6039, lng:81.1908, label:"Sayram Lake",   gmaps:"Sayram Lake, Xinjiang, China"},
+  turpan:      {lat:42.9476, lng:89.1897, label:"Turpan",        gmaps:"Flame Mountains, Turpan, Xinjiang, China"},
+  tuyugou:     {lat:42.9333, lng:89.5167, label:"Tuyu Valley",   gmaps:"Tuyugou Grape Valley, Turpan, Xinjiang, China"},
+  shanshan:    {lat:42.8667, lng:90.2167, label:"Shanshan",      gmaps:"Shanshan County, Xinjiang, China"},
+};
+
+const FULL_ROUTE = ["urumqi","jiangjunshan","altay","hemu","baihaba","kanas","sanwan","buerjin","wuerhe","karamay","dushanzi","jinghe","sayram","urumqi","turpan","tuyugou","shanshan","urumqi"];
+
+const DAYS = [
+ { day:6, date:"Oct 6", route:["urumqi","jiangjunshan","altay"],
+   title:"Urumqi → S21 Desert Highway → Jiangjunshan Sunset → Altay",
+   detour:{name:"Ulungur Lake, Fuhai", time:"+45 min", lat:47.05, lng:87.40, anchor:"jiangjunshan",
+     gmaps:"Ulungur Lake, Fuhai County, Xinjiang, China",
+     desc:"A swing east off the S21 — a huge desert lake known for migratory birds and a flat, mirror-still sunset."},
+   cards:[
+     {stop:"urumqi", tag:"start", title:"Urumqi", desc:"Trip departure. Mild city morning before the long desert-highway push north.",
+       hi:15, lo:5, cond:"Dry and mostly clear; the day/night gap widens fast this month.",
+       wear:["Light layers","Packable windbreaker","Comfortable walking shoes"]},
+     {stop:"jiangjunshan", tag:"stop", title:"Jiangjunshan (General's Mountain)", desc:"Exposed sunset viewpoint above the desert highway — the wind picks up hard as the sun drops.",
+       hi:9, lo:-1, cond:"Clear but windy; apparent temperature drops sharply once the sun is low.",
+       wear:["Windproof shell","Warm mid-layer","Beanie or hood"]},
+     {stop:"altay", tag:"stay", title:"Altay", desc:"Overnight in the gateway city to the far north — noticeably colder than Urumqi after dark.",
+       hi:11, lo:0, cond:"Cold, clear nights; frost likely by morning.",
+       wear:["Down or heavy fleece jacket","Thermal base layer","Gloves for evening streets"]},
+   ]},
+ { day:7, date:"Oct 7", route:["altay","hemu"],
+   title:"Altay–Hemu Highway (Ahe Highway) → Hemu Bridge",
+   detour:{name:"Jiadengyu Viewpoint", time:"+10 min", lat:48.05, lng:87.05, anchor:"hemu",
+     gmaps:"Jiadengyu Viewpoint, Xinjiang, China",
+     desc:"The switchback lookout partway along the Ahe Highway — the classic elevated shot over the valley and river bends, right on the road to Hemu."},
+   cards:[
+     {stop:"hemu", tag:"stay", title:"Hemu", desc:"Forest village at the foot of the Altay mountains, golden birch and larch season in full swing.",
+       hi:9, lo:-2, cond:"Sharp overnight frost; mornings can start below freezing before burning off.",
+       wear:["Down jacket","Thermal base + mid layer","Waterproof boots","Gloves and beanie"]},
+   ]},
+ { day:8, date:"Oct 8", route:["hemu","baihaba"],
+   title:"Hemu → Baihaba",
+   detour:{name:"Northwest Corner watchtower", time:"+30 min", lat:48.98, lng:86.83, anchor:"baihaba",
+     gmaps:"China Northwest Corner, Baihaba, Xinjiang, China",
+     desc:"A marker near China's northwesternmost point, close to the Kazakhstan–Mongolia tri-border area — a quiet detour before dropping into Baihaba's valley."},
+   cards:[
+     {stop:"baihaba", tag:"stay", title:"Baihaba", desc:"Remote Tuvan and Kazakh border village, one of the most isolated stops on the loop.",
+       hi:8, lo:-3, cond:"Similar to Hemu, slightly colder overnight — this valley holds cold air.",
+       wear:["Down jacket","Thermal layers","Sturdy waterproof boots","Gloves"]},
+   ]},
+ { day:9, date:"Oct 9", route:["baihaba","kanas","sanwan","buerjin"],
+   title:"Baihaba → Kanas Lake → Sanwan → Buerjin",
+   detour:{name:"Guanyuting (God's Viewpoint)", time:"+1.5–2 hr", lat:48.70, lng:87.03, anchor:"kanas",
+     gmaps:"Guanyu Pavilion, Kanas Lake, Xinjiang, China",
+     desc:"The cable-car platform above Kanas Lake gives the full panorama over the three bays — worth the queue if the morning is clear."},
+   cards:[
+     {stop:"kanas", tag:"stop", title:"Kanas Lake", desc:"Alpine lake ringed by golden larch — the wind off the water cuts through fast.",
+       hi:9, lo:-1, cond:"Cold lakeside wind chill even on a sunny day; glare off the water is strong.",
+       wear:["Insulated windproof jacket","Gloves","Sunglasses"]},
+     {stop:"sanwan", tag:"stop", title:"Sanwan (Three Bays)", desc:"Moon Bay, Sleeping Dragon Bay and Fairy Bay viewpoints along the same stretch of river.",
+       hi:9, lo:-1, cond:"Same cold, breezy conditions as Kanas — dress once for the whole stop.",
+       wear:["Insulated windproof jacket","Warm hat","Trail shoes with grip"]},
+     {stop:"buerjin", tag:"stay", title:"Buerjin", desc:"Lower river-valley town, noticeably milder than the lake stops above.",
+       hi:12, lo:1, cond:"Cool evenings but calmer than the alpine stops today.",
+       wear:["Mid-weight jacket","Layers for the evening market"]},
+   ]},
+ { day:10, date:"Oct 10", route:["buerjin","wuerhe","karamay"],
+   title:"Buerjin → World Devil City → Karamay",
+   detour:{name:"Wucaitan (Colorful Beach)", time:"+30 min", lat:48.00, lng:86.60, anchor:"buerjin",
+     gmaps:"Wucaitan Colorful Beach, Burqin, Xinjiang, China",
+     desc:"Eroded rainbow-striped cliffs near Buerjin, best around sunset — a natural stop before the drive out to the yardang fields."},
+   cards:[
+     {stop:"wuerhe", tag:"stop", title:"World Devil City (Wuerhe)", desc:"Yardang wind-eroded desert landform — famously loud and windy, especially in the afternoon.",
+       hi:14, lo:2, cond:"Strong, gritty wind is the defining feature; otherwise dry and sunny.",
+       wear:["Windbreaker or shell","Buff or scarf for dust","Sunglasses"]},
+     {stop:"karamay", tag:"stay", title:"Karamay", desc:"Xinjiang's oil city — mild overnight compared with the mountain stops so far.",
+       hi:16, lo:3, cond:"Dry, mild, still breezy after dark.",
+       wear:["Light jacket","Layers","Wind-resistant outer layer"]},
+   ]},
+ { day:11, date:"Oct 11", route:["karamay","dushanzi","jinghe"],
+   title:"Karamay → Dushanzi Grand Canyon → Jinghe",
+   detour:{name:"Dushanzi old refinery lookout", time:"+10 min", lat:44.15, lng:84.75, anchor:"dushanzi",
+     gmaps:"Dushanzi Oil Town, Karamay, Xinjiang, China",
+     desc:"A quick stop on the region's oil-boom history, right by the canyon turnoff — five minutes off the main road."},
+   cards:[
+     {stop:"dushanzi", tag:"stop", title:"Dushanzi Grand Canyon", desc:"Red-rock badland canyon with an exposed rim trail — windier than it looks from the car park.",
+       hi:15, lo:2, cond:"Clear and dry; wind gusts along the rim can be sharp.",
+       wear:["Windproof jacket","Shoes with good grip","Sun hat"]},
+     {stop:"jinghe", tag:"stay", title:"Jinghe", desc:"Overnight transit town before the climb up to Sayram Lake.",
+       hi:16, lo:2, cond:"Mild and dry, similar to Karamay.",
+       wear:["Light-to-medium jacket","Layers"]},
+   ]},
+ { day:12, date:"Oct 12", route:["jinghe","sayram"],
+   title:"Jinghe → Circumnavigation of Sayram Lake",
+   detour:{name:"Guozigou Valley (Fruit Valley)", time:"On route", lat:44.35, lng:81.95, anchor:"jinghe",
+     gmaps:"Guozigou Valley, Xinjiang, China",
+     desc:"A dramatic canyon road on the way up, crossed by one of China's tallest highway bridges — worth slowing down for, not just driving through."},
+   cards:[
+     {stop:"sayram", tag:"stay", title:"Sayram Lake", desc:"High alpine lake at ~2,070m, circled by road today — the coldest, windiest overnight of the trip.",
+       hi:10, lo:-3, cond:"Big day/night swing at altitude; wind off the lake adds real chill.",
+       wear:["Heavy down jacket","Thermal base + mid layer","Warm hat and gloves","Windproof shell"]},
+   ]},
+ { day:13, date:"Oct 13", route:["sayram","urumqi"],
+   title:"Sayram Lake Sunrise → Urumqi",
+   detour:{name:"Guozigou Grand Bridge viewpoint", time:"On route", lat:44.36, lng:81.97, anchor:"sayram",
+     gmaps:"Guozigou Grand Bridge, Xinjiang, China",
+     desc:"If you didn't stop yesterday, catch the bridge and valley view on the way back down — better light in the morning."},
+   cards:[
+     {stop:"sayram", tag:"stop", title:"Sayram Lake, sunrise", desc:"Predawn shoot over the lake before the long drive back to Urumqi.",
+       hi:4, lo:-5, cond:"The coldest single hour of the trip — still air, hard frost.",
+       wear:["Full winter layers","Insulated boots","Hand warmers"]},
+     {stop:"urumqi", tag:"stay", title:"Urumqi", desc:"Back to the city for the night, layers come back off through the afternoon.",
+       hi:15, lo:5, cond:"Mild by comparison — dry with a clear evening.",
+       wear:["Shed down to light-medium layers","Comfortable shoes"]},
+   ]},
+ { day:14, date:"Oct 14", route:["urumqi","turpan","tuyugou","shanshan"],
+   title:"Urumqi → Turpan Flame Mountain → Tuyu Valley → Shanshan",
+   detour:{name:"Jiaohe Ancient City & Karez wells", time:"+1 hr", lat:42.9394, lng:89.0272, anchor:"turpan",
+     gmaps:"Jiaohe Ancient City, Turpan, Xinjiang, China",
+     desc:"Ruins and the underground irrigation exhibit are minutes from Flame Mountain — the easiest detour of the whole trip to justify."},
+   cards:[
+     {stop:"turpan", tag:"stop", title:"Turpan / Flame Mountain", desc:"Lowest, hottest basin in China — a real jump in temperature after the mountains.",
+       hi:24, lo:11, cond:"Warm and dry with strong desert sun; the surface rock runs far hotter than the air.",
+       wear:["Light breathable clothing","Sun hat","Sunglasses","Sunscreen"]},
+     {stop:"tuyugou", tag:"stop", title:"Tuyu Valley", desc:"Green oasis gorge cut into the Flame Mountains, grape trellises and a Uyghur village.",
+       hi:23, lo:11, cond:"Still warm; shade in the gorge is a welcome break from the open desert.",
+       wear:["Light layers","Sun hat","Comfortable walking shoes"]},
+     {stop:"shanshan", tag:"stay", title:"Shanshan", desc:"Overnight in the basin — evenings cool off quickly once the sun is down.",
+       hi:22, lo:10, cond:"Warm days, a fast cool-down after dark — bring one layer back out for dinner.",
+       wear:["Light clothing for the day","One warmer layer for evening"]},
+   ]},
+ { day:15, date:"Oct 15", route:["shanshan","urumqi"],
+   title:"Shanshan → Urumqi (trip end)",
+   detour:{name:"Astana Tombs or Gaochang Ancient City", time:"+45 min", lat:42.9167, lng:89.4333, anchor:"tuyugou",
+     gmaps:"Astana Ancient Tombs, Turpan, Xinjiang, China",
+     desc:"If Jiaohe was yesterday's stop, either of these ancient-city sites makes a good last detour before the drive back to Urumqi."},
+   cards:[
+     {stop:"urumqi", tag:"end", title:"Urumqi", desc:"Back to the mild city climate to close out the loop.",
+       hi:14, lo:4, cond:"Cooler than a week ago — October's steady slide toward winter is noticeable by now.",
+       wear:["Medium layers","Warm jacket for the evening"]},
+   ]},
+];
+
+function gmapsDirUrl(routeIds){
+  const parts = routeIds.map(id => encodeURIComponent(STOPS[id].gmaps));
+  return `https://www.google.com/maps/dir/${parts.join("/")}`;
+}
+function gmapsSearchUrl(query){
+  return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`;
+}
+
+const COLOR_MUTED = "#c7b489";
+const COLOR_ACTIVE = "#0e8e83";
+const COLOR_DETOUR = "#a8721c";
+
+let map, fullRoutePolyline, dayRoutePolyline, detourLine, detourMarker;
+const MARKERS = {};
+let infoWindow;
+
+function markerIcon(color, scale){
+  return { path: google.maps.SymbolPath.CIRCLE, scale: scale || 7, fillColor: color, fillOpacity: 1, strokeColor: "#ffffff", strokeWeight: 2 };
+}
+function diamondIcon(color){
+  return { path: "M 0,-8 8,0 0,8 -8,0 Z", fillColor: color, fillOpacity: 1, strokeColor: "#ffffff", strokeWeight: 1.5, scale: 1 };
+}
+
+const dayScroll = document.getElementById("dayScroll");
+DAYS.forEach(d => {
+  const b = document.createElement("button");
+  b.className = "day-btn";
+  b.dataset.day = d.day;
+  b.innerHTML = `<span class="d">DAY ${d.day}</span><span class="t">${d.date}</span>`;
+  b.addEventListener("click", () => selectDay(d.day));
+  dayScroll.appendChild(b);
+});
+
+let currentDay = DAYS[0].day;
+
+window.initMap = function(){
+  map = new google.maps.Map(document.getElementById("map"), {
+    center: {lat:46.5, lng:86.5},
+    zoom: 6,
+    mapTypeControl: true,
+    streetViewControl: false,
+    fullscreenControl: true,
+  });
+  infoWindow = new google.maps.InfoWindow();
+
+  const lineSymbol = { path: "M 0,-1 0,1", strokeOpacity: 1, scale: 3 };
+  fullRoutePolyline = new google.maps.Polyline({
+    path: FULL_ROUTE.map(id => STOPS[id]),
+    strokeOpacity: 0,
+    strokeColor: COLOR_MUTED,
+    icons: [{ icon: lineSymbol, offset: "0", repeat: "16px" }],
+    map,
+  });
+
+  dayRoutePolyline = new google.maps.Polyline({ path: [], strokeColor: COLOR_ACTIVE, strokeOpacity: 0.95, strokeWeight: 5, map });
+  detourLine = new google.maps.Polyline({
+    path: [], strokeOpacity: 0, strokeColor: COLOR_DETOUR,
+    icons: [{ icon: { path: "M 0,-1 0,1", strokeOpacity: 1, scale: 2.5 }, offset: "0", repeat: "10px" }],
+    map,
+  });
+
+  const bounds = new google.maps.LatLngBounds();
+  Object.entries(STOPS).forEach(([id, s]) => {
+    bounds.extend(s);
+    const marker = new google.maps.Marker({
+      position: { lat: s.lat, lng: s.lng },
+      map, title: s.label, icon: markerIcon(COLOR_MUTED),
+      zIndex: 10,
+    });
+    marker.addListener("click", () => {
+      infoWindow.setContent(`<div style="font:600 13px Inter,sans-serif;padding:2px 4px;">${s.label}</div>`);
+      infoWindow.open(map, marker);
+      const hostDay = DAYS.find(d => d.route.includes(id));
+      if (hostDay) selectDay(hostDay.day, id);
+    });
+    MARKERS[id] = marker;
+  });
+  map.fitBounds(bounds, 40);
+
+  detourMarker = new google.maps.Marker({ map, icon: diamondIcon(COLOR_DETOUR), zIndex: 20 });
+  detourMarker.addListener("click", () => {
+    const data = DAYS.find(d => d.day === currentDay);
+    infoWindow.setContent(`<div style="font:600 13px Inter,sans-serif;padding:2px 4px;">${data.detour.name}<br><span style="font:11px 'JetBrains Mono',monospace;color:#a8721c;">${data.detour.time}</span></div>`);
+    infoWindow.open(map, detourMarker);
+  });
+
+  selectDay(currentDay);
+};
+
+function selectDay(day, scrollToStop){
+  currentDay = day;
+  const data = DAYS.find(d => d.day === day);
+
+  document.querySelectorAll(".day-btn").forEach(b => b.classList.toggle("active", Number(b.dataset.day) === day));
+
+  if (map) {
+    const activeStops = new Set(data.route);
+    Object.entries(MARKERS).forEach(([id, marker]) => {
+      const active = activeStops.has(id);
+      marker.setIcon(markerIcon(active ? COLOR_ACTIVE : COLOR_MUTED, active ? 8 : 6));
+      marker.setZIndex(active ? 15 : 10);
+    });
+
+    dayRoutePolyline.setPath(data.route.map(id => STOPS[id]));
+
+    const dt = data.detour;
+    const anchor = STOPS[dt.anchor];
+    detourLine.setPath([anchor, { lat: dt.lat, lng: dt.lng }]);
+    detourMarker.setPosition({ lat: dt.lat, lng: dt.lng });
+
+    const bounds = new google.maps.LatLngBounds();
+    data.route.forEach(id => bounds.extend(STOPS[id]));
+    bounds.extend({ lat: dt.lat, lng: dt.lng });
+    map.fitBounds(bounds, 60);
+  }
+
+  const dt = data.detour;
+  document.getElementById("routeLabelDay").innerHTML = `<b>Day ${data.day}</b> &middot; ${data.date}`;
+  document.getElementById("routeTitle").textContent = data.title;
+  document.getElementById("routeMapLink").href = gmapsDirUrl(data.route);
+  document.getElementById("detourName").textContent = dt.name;
+  document.getElementById("detourDesc").textContent = dt.desc;
+  document.getElementById("detourTime").textContent = dt.time;
+  document.getElementById("detourMapLink").href = gmapsSearchUrl(dt.gmaps);
+
+  const cardsEl = document.getElementById("cards");
+  cardsEl.innerHTML = "";
+  data.cards.forEach((c, i) => {
+    const card = document.createElement("div");
+    card.className = "card";
+    card.id = `card-${data.day}-${c.stop}`;
+    card.innerHTML = `
+      <div class="card-head">
+        <p class="card-name">${i+1}. ${c.title}</p>
+        <span class="tag ${c.tag}">${c.tag}</span>
+      </div>
+      <p class="card-desc">${c.desc}</p>
+      <div class="info-grid">
+        <div class="block">
+          <p class="k">Weather</p>
+          <div class="temps"><span class="hi">${c.hi}°C</span><span class="lo">low ${c.lo}°C</span></div>
+          <p class="cond">${c.cond}</p>
+        </div>
+        <div class="block">
+          <p class="k">What to wear</p>
+          <ul class="wear-list">${c.wear.map(w => `<li>${w}</li>`).join("")}</ul>
+        </div>
+      </div>
+      <p class="card-foot"><a class="maplink" href="${gmapsSearchUrl(STOPS[c.stop].gmaps)}" target="_blank" rel="noopener noreferrer">View ${c.title} on Google Maps ↗</a></p>
+    `;
+    card.addEventListener("click", (e) => {
+      if (e.target.closest("a")) return;
+      if (map && MARKERS[c.stop]) { map.panTo(MARKERS[c.stop].getPosition()); google.maps.event.trigger(MARKERS[c.stop], "click"); }
+    });
+    cardsEl.appendChild(card);
+  });
+
+  if (scrollToStop) {
+    requestAnimationFrame(() => {
+      const el = document.getElementById(`card-${data.day}-${scrollToStop}`);
+      if (el) {
+        el.scrollIntoView({behavior:"smooth", block:"center"});
+        el.classList.add("pulse");
+        setTimeout(() => el.classList.remove("pulse"), 1400);
+      }
+    });
+  }
+}
+
+/* ---- Google Maps loader ---- */
+const GOOGLE_MAPS_API_KEY = "AIzaSyBH9tbBtoYUarPTIGQLFiOTqqaonuXpfKw";
+
+if (GOOGLE_MAPS_API_KEY === "YOUR_GOOGLE_MAPS_API_KEY") {
+  document.getElementById("keyBanner").classList.add("show");
+  document.getElementById("map").innerHTML =
+    '<div style="height:100%;display:flex;align-items:center;justify-content:center;color:var(--ink-dim);font-size:13px;padding:20px;text-align:center;">Map will render here once an API key is added — see the note above.</div>';
+  selectDay(currentDay); // still render cards/panels without the map
+} else {
+  const s = document.createElement("script");
+  s.src = `https://maps.googleapis.com/maps/api/js?key=${GOOGLE_MAPS_API_KEY}&callback=initMap`;
+  s.async = true;
+  s.defer = true;
+  document.head.appendChild(s);
+}
+</script>
+</body>
+</html>
