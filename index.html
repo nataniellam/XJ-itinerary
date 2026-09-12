@@ -168,7 +168,7 @@ footer p{font-size:12px;color:var(--ink-dim);line-height:1.6;margin:0 0 6px;max-
           <span class="time" id="detourTime"></span>
         </div>
         <div class="body">
-          <img class="img" id="detourImg" style="display:none" alt="" loading="lazy">
+          <img class="img" id="detourImg" style="display:none" alt="" loading="lazy" onerror="this.style.display='none'">
           <div>
             <p class="name" id="detourName"></p>
             <p class="desc" id="detourDesc"></p>
@@ -186,27 +186,40 @@ footer p{font-size:12px;color:var(--ink-dim);line-height:1.6;margin:0 0 6px;max-
     <p><strong>Map:</strong> a live Google Map — pan, zoom and switch to satellite view same as any embedded Google Map. Each day's route is the actual driving directions between its stops, not a straight line; muted lines behind it are every other day, for context. Click a pin or a card to select its day — the matching pin turns teal instead of popping up a label.</p>
     <p><strong>Detours:</strong> the gold diamond and dashed line show where a detour sits relative to that day's route; selecting a day zooms the map to fit that day's stops plus the detour, so you can judge the real distance at a glance. Added time is a rough estimate, not a fixed number.</p>
     <p><strong>Weather:</strong> figures are October seasonal averages for each area (high / low, typical conditions), not a live forecast for your travel dates. Recheck closer to departure, especially for Kanas, Hemu, Baihaba and Sayram Lake, where an early cold snap or first snowfall can shift things fast.</p>
+    <p><strong>Photos:</strong> freely licensed images from Wikimedia Commons, credited under each one. A handful of stops and detours (Hemu Bridge, Baihaba, Dushanzi, Jinghe, Shanshan, and a few of the smaller detours) don't have a suitable photo yet — their cards just skip the image rather than show a wrong or broken one.</p>
   </footer>
 </div>
 
 <script>
 const STOPS = {
-  urumqi:      {lat:43.8256, lng:87.6168, label:"Urumqi",        gmaps:"Ürümqi, Xinjiang, China"},
-  jiangjunshan:{lat:47.8500, lng:88.1500, label:"Jiangjunshan",  gmaps:"Jiangjun Mountain, Altay, Xinjiang, China"},
-  altay:       {lat:47.8269, lng:88.1308, label:"Altay",         gmaps:"Altay City, Xinjiang, China"},
-  hemu:        {lat:48.7167, lng:87.0167, label:"Hemu",          gmaps:"Hemu Village, Xinjiang, China"},
+  urumqi:      {lat:43.8256, lng:87.6168, label:"Urumqi",        gmaps:"Ürümqi, Xinjiang, China",
+    img:{url:"https://upload.wikimedia.org/wikipedia/commons/a/a8/Urumqi_Skyline_July_2019.jpg", credit:"Photo: Albertaont / CC BY-SA 4.0, via Wikimedia Commons"}},
+  jiangjunshan:{lat:47.8500, lng:88.1500, label:"Jiangjunshan",  gmaps:"Jiangjun Mountain, Altay, Xinjiang, China",
+    img:{url:"https://upload.wikimedia.org/wikipedia/commons/9/9e/Altay_China_horizon_-_Jiangjunshan_Ski_Resort.jpg", credit:"Photo: Pazakui / CC BY 4.0, via Wikimedia Commons"}},
+  altay:       {lat:47.8269, lng:88.1308, label:"Altay",         gmaps:"Altay City, Xinjiang, China",
+    img:{url:"https://upload.wikimedia.org/wikipedia/commons/e/e1/Altay%2C_China_Panorama.jpg", credit:"Photo: Pazakui / CC BY-SA 4.0, via Wikimedia Commons"}},
+  hemu:        {lat:48.7167, lng:87.0167, label:"Hemu",          gmaps:"Hemu Village, Xinjiang, China",
+    img:{url:"https://upload.wikimedia.org/wikipedia/commons/d/d9/Altay_Hemu_village.jpg", credit:"Photo: Pazakui / CC BY 4.0, via Wikimedia Commons"}},
   hemubridge:  {lat:48.7140, lng:87.0130, label:"Hemu Bridge",   gmaps:"Hemu Bridge, Hemu Village, Xinjiang, China"},
   baihaba:     {lat:48.9500, lng:86.9800, label:"Baihaba",       gmaps:"Baihaba Village, Xinjiang, China"},
-  kanas:       {lat:48.6833, lng:87.0167, label:"Kanas Lake",    gmaps:"Kanas Lake, Xinjiang, China"},
-  sanwan:      {lat:48.5967, lng:87.0167, label:"Sanwan",        gmaps:"Kanas Sanwan Three Bays, Xinjiang, China"},
-  buerjin:     {lat:47.7025, lng:86.8733, label:"Buerjin",       gmaps:"Burqin County, Xinjiang, China"},
-  wuerhe:      {lat:46.2000, lng:85.8000, label:"World Devil City", gmaps:"Wuerhe Ghost City, Karamay, Xinjiang, China"},
-  karamay:     {lat:45.5799, lng:84.8892, label:"Karamay",       gmaps:"Karamay, Xinjiang, China"},
+  kanas:       {lat:48.6833, lng:87.0167, label:"Kanas Lake",    gmaps:"Kanas Lake, Xinjiang, China",
+    img:{url:"https://upload.wikimedia.org/wikipedia/commons/a/a0/Lake_Kanas.jpg", credit:"Photo: Wang Xiaozhe and Meng Jie / CC BY-SA 3.0, via Wikimedia Commons"}},
+  sanwan:      {lat:48.5967, lng:87.0167, label:"Sanwan",        gmaps:"Kanas Sanwan Three Bays, Xinjiang, China",
+    img:{url:"https://upload.wikimedia.org/wikipedia/commons/4/42/Moon_Bay_on_Kanas_River%2C_Xinjiang%2C_China.jpg", credit:"Photo: Yoshi Canopus / CC BY-SA 4.0, via Wikimedia Commons"}},
+  buerjin:     {lat:47.7025, lng:86.8733, label:"Buerjin",       gmaps:"Burqin County, Xinjiang, China",
+    img:{url:"https://upload.wikimedia.org/wikipedia/commons/d/d4/Burqin.jpg", credit:"Photo: Fanghong / CC BY-SA 3.0, via Wikimedia Commons"}},
+  wuerhe:      {lat:46.2000, lng:85.8000, label:"World Devil City", gmaps:"Wuerhe Ghost City, Karamay, Xinjiang, China",
+    img:{url:"https://upload.wikimedia.org/wikipedia/commons/2/20/%E4%B8%AD%E5%9B%BD%E6%96%B0%E7%96%86%E5%85%8B%E6%8B%89%E7%8E%9B%E4%BE%9D%E5%B8%82%E9%AD%94%E9%AC%BC%E5%9F%8E_China_Xinjiang%2C_Karamay_Ghost_City_China_X_-_panoramio.jpg", credit:"Photo: 罗布泊 (via Panoramio) / CC BY 3.0, via Wikimedia Commons"}},
+  karamay:     {lat:45.5799, lng:84.8892, label:"Karamay",       gmaps:"Karamay, Xinjiang, China",
+    img:{url:"https://upload.wikimedia.org/wikipedia/commons/3/31/Oil_pumps_in_the_land_around_the_city_of_Karamay_in_northwest_China_in_July_2012.jpg", credit:"Photo: Gpwitteveen / CC BY-SA 4.0, via Wikimedia Commons"}},
   dushanzi:    {lat:44.1467, lng:84.7433, label:"Dushanzi",      gmaps:"Dushanzi Grand Canyon, Xinjiang, China"},
   jinghe:      {lat:44.5978, lng:82.8992, label:"Jinghe",        gmaps:"Jinghe County, Xinjiang, China"},
-  sayram:      {lat:44.6039, lng:81.1908, label:"Sayram Lake",   gmaps:"Sayram Lake, Xinjiang, China"},
-  turpan:      {lat:42.9476, lng:89.1897, label:"Turpan",        gmaps:"Flame Mountains, Turpan, Xinjiang, China"},
-  tuyugou:     {lat:42.9333, lng:89.5167, label:"Tuyu Valley",   gmaps:"Tuyugou Grape Valley, Turpan, Xinjiang, China"},
+  sayram:      {lat:44.6039, lng:81.1908, label:"Sayram Lake",   gmaps:"Sayram Lake, Xinjiang, China",
+    img:{url:"https://upload.wikimedia.org/wikipedia/commons/6/6a/The_shore_of_Sayram_Lake.jpg", credit:"Photo: Fumikas Sagisavas / CC0 Public Domain, via Wikimedia Commons"}},
+  turpan:      {lat:42.9476, lng:89.1897, label:"Turpan",        gmaps:"Flame Mountains, Turpan, Xinjiang, China",
+    img:{url:"https://upload.wikimedia.org/wikipedia/commons/9/9c/Turpan-flaming-mountains-d02.jpg", credit:"Photo: Colegota / CC BY-SA 2.5 ES, via Wikimedia Commons"}},
+  tuyugou:     {lat:42.9333, lng:89.5167, label:"Tuyu Valley",   gmaps:"Tuyugou Grape Valley, Turpan, Xinjiang, China",
+    img:{url:"https://upload.wikimedia.org/wikipedia/commons/5/52/Tuyugou_Turpan_Xinjiang_China_%E6%96%B0%E7%96%86_%E5%90%90%E9%AD%AF%E7%95%AA_%E5%90%90%E5%B3%AA%E6%B2%9F_-_panoramio_%282%29.jpg", credit:"Photo: Hiroki Ogawa (via Panoramio) / CC BY 3.0, via Wikimedia Commons"}},
   shanshan:    {lat:42.8667, lng:90.2167, label:"Shanshan",      gmaps:"Shanshan County, Xinjiang, China"},
 };
 
@@ -215,7 +228,8 @@ const DAYS = [
    title:"Urumqi → S21 Desert Highway → Jiangjunshan Sunset → Altay",
    detour:{name:"Ulungur Lake, Fuhai", time:"+45 min", lat:47.05, lng:87.40, anchor:"jiangjunshan",
      gmaps:"Ulungur Lake, Fuhai County, Xinjiang, China",
-     desc:"A swing east off the S21 — a huge desert lake known for migratory birds and a flat, mirror-still sunset."},
+     desc:"A swing east off the S21 — a huge desert lake known for migratory birds and a flat, mirror-still sunset.",
+     img:{url:"https://upload.wikimedia.org/wikipedia/commons/c/cf/%E4%B9%8C%E4%BC%A6%E5%8F%A4%E6%B9%96-%E9%BB%84%E9%87%91%E6%B5%B7%E5%B2%B8.jpg", credit:"Photo: HaziiDozen / CC BY-SA 4.0, via Wikimedia Commons"}},
    cards:[
      {stop:"urumqi", tag:"start", title:"Urumqi", desc:"Trip departure. Mild city morning before the long desert-highway push north.",
        hi:15, lo:5, cond:"Dry and mostly clear; the day/night gap widens fast this month.",
@@ -231,7 +245,8 @@ const DAYS = [
    title:"Altay–Hemu Highway (Ahe Highway) → Hemu Bridge → Hemu",
    detour:{name:"Jiadengyu Viewpoint", time:"+10 min", lat:48.05, lng:87.05, anchor:"hemu",
      gmaps:"Jiadengyu Viewpoint, Xinjiang, China",
-     desc:"The switchback lookout partway along the Ahe Highway — the classic elevated shot over the valley and river bends, right on the road to Hemu."},
+     desc:"The switchback lookout partway along the Ahe Highway — the classic elevated shot over the valley and river bends, right on the road to Hemu.",
+     img:{url:"https://upload.wikimedia.org/wikipedia/commons/3/37/%E8%B4%BE%E7%99%BB%E5%B3%AA-%E7%A6%BE%E6%9C%A8%E9%80%94%E4%B8%AD_-_panoramio.jpg", credit:"Photo: neverdance (via Panoramio) / CC BY-SA 3.0, via Wikimedia Commons"}},
    cards:[
      {stop:"hemubridge", tag:"stop", title:"Hemu Bridge", desc:"Wooden bridge over the Hemu River at the village entrance — the classic elevated view back over Hemu's rooftops and the valley.",
        hi:9, lo:-2, cond:"Same crisp mountain air as the village; the riverbank adds a bit of extra chill right at the bridge.",
@@ -270,7 +285,8 @@ const DAYS = [
    title:"Buerjin → World Devil City → Karamay",
    detour:{name:"Wucaitan (Colorful Beach)", time:"+30 min", lat:48.00, lng:86.60, anchor:"buerjin",
      gmaps:"Wucaitan Colorful Beach, Burqin, Xinjiang, China",
-     desc:"Eroded rainbow-striped cliffs near Buerjin, best around sunset — a natural stop before the drive out to the yardang fields."},
+     desc:"Eroded rainbow-striped cliffs near Buerjin, best around sunset — a natural stop before the drive out to the yardang fields.",
+     img:{url:"https://upload.wikimedia.org/wikipedia/commons/5/5b/Wucaitan.jpg", credit:"Photo: Anh minh / CC BY-SA 3.0, via Wikimedia Commons"}},
    cards:[
      {stop:"wuerhe", tag:"stop", title:"World Devil City (Wuerhe)", desc:"Yardang wind-eroded desert landform — famously loud and windy, especially in the afternoon.",
        hi:14, lo:2, cond:"Strong, gritty wind is the defining feature; otherwise dry and sunny.",
@@ -296,7 +312,8 @@ const DAYS = [
    title:"Jinghe → Circumnavigation of Sayram Lake",
    detour:{name:"Guozigou Valley (Fruit Valley)", time:"On route", lat:44.35, lng:81.95, anchor:"jinghe",
      gmaps:"Guozigou Valley, Xinjiang, China",
-     desc:"A dramatic canyon road on the way up, crossed by one of China's tallest highway bridges — worth slowing down for, not just driving through."},
+     desc:"A dramatic canyon road on the way up, crossed by one of China's tallest highway bridges — worth slowing down for, not just driving through.",
+     img:{url:"https://upload.wikimedia.org/wikipedia/commons/0/0e/Guozigou_Bridge_far_view.jpg", credit:"Photo: Timothytyy / CC BY 4.0, via Wikimedia Commons"}},
    cards:[
      {stop:"sayram", tag:"stay", title:"Sayram Lake", desc:"High alpine lake at ~2,070m, circled by road today — the coldest, windiest overnight of the trip.",
        hi:10, lo:-3, cond:"Big day/night swing at altitude; wind off the lake adds real chill.",
@@ -306,7 +323,8 @@ const DAYS = [
    title:"Sayram Lake Sunrise → Urumqi",
    detour:{name:"Guozigou Grand Bridge viewpoint", time:"On route", lat:44.36, lng:81.97, anchor:"sayram",
      gmaps:"Guozigou Grand Bridge, Xinjiang, China",
-     desc:"If you didn't stop yesterday, catch the bridge and valley view on the way back down — better light in the morning."},
+     desc:"If you didn't stop yesterday, catch the bridge and valley view on the way back down — better light in the morning.",
+     img:{url:"https://upload.wikimedia.org/wikipedia/commons/f/f8/Guozigou_Bridge.jpg", credit:"Photo: 千里走单骑 / CC BY-SA 3.0, via Wikimedia Commons"}},
    cards:[
      {stop:"sayram", tag:"stop", title:"Sayram Lake, sunrise", desc:"Predawn shoot over the lake before the long drive back to Urumqi.",
        hi:4, lo:-5, cond:"The coldest single hour of the trip — still air, hard frost.",
@@ -319,7 +337,8 @@ const DAYS = [
    title:"Urumqi → Turpan Flame Mountain → Tuyu Valley → Shanshan",
    detour:{name:"Jiaohe Ancient City & Karez wells", time:"+1 hr", lat:42.9394, lng:89.0272, anchor:"turpan",
      gmaps:"Jiaohe Ancient City, Turpan, Xinjiang, China",
-     desc:"Ruins and the underground irrigation exhibit are minutes from Flame Mountain — the easiest detour of the whole trip to justify."},
+     desc:"Ruins and the underground irrigation exhibit are minutes from Flame Mountain — the easiest detour of the whole trip to justify.",
+     img:{url:"https://upload.wikimedia.org/wikipedia/commons/1/1f/Jiaohe_City%28Yarkhoto%29%2CTurpan%2CXinjiang_HY4.jpg", credit:"Photo: Hiroooooo / CC BY-SA 3.0, via Wikimedia Commons"}},
    cards:[
      {stop:"turpan", tag:"stop", title:"Turpan / Flame Mountain", desc:"Lowest, hottest basin in China — a real jump in temperature after the mountains.",
        hi:24, lo:11, cond:"Warm and dry with strong desert sun; the surface rock runs far hotter than the air.",
@@ -335,7 +354,8 @@ const DAYS = [
    title:"Shanshan → Urumqi (trip end)",
    detour:{name:"Astana Tombs or Gaochang Ancient City", time:"+45 min", lat:42.9167, lng:89.4333, anchor:"tuyugou",
      gmaps:"Astana Ancient Tombs, Turpan, Xinjiang, China",
-     desc:"If Jiaohe was yesterday's stop, either of these ancient-city sites makes a good last detour before the drive back to Urumqi."},
+     desc:"If Jiaohe was yesterday's stop, either of these ancient-city sites makes a good last detour before the drive back to Urumqi.",
+     img:{url:"https://upload.wikimedia.org/wikipedia/commons/6/68/Astana-view.jpg", credit:"Photo: Otebig / Public domain, via Wikimedia Commons"}},
    cards:[
      {stop:"urumqi", tag:"end", title:"Urumqi", desc:"Back to the mild city climate to close out the loop.",
        hi:14, lo:4, cond:"Cooler than a week ago — October's steady slide toward winter is noticeable by now.",
@@ -514,7 +534,7 @@ function selectDay(day, scrollToStop){
     card.id = `card-${data.day}-${c.stop}`;
     const stopImg = STOPS[c.stop].img;
     card.innerHTML = `
-      ${stopImg ? `<img class="card-img" src="${stopImg.url}" alt="${c.title}" loading="lazy">` : ""}
+      ${stopImg ? `<img class="card-img" src="${stopImg.url}" alt="${c.title}" loading="lazy" onerror="this.remove()">` : ""}
       <div class="card-head">
         <p class="card-name">${i+1}. ${c.title}</p>
         <span class="tag ${c.tag}">${c.tag}</span>
