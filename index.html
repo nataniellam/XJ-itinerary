@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Junggar Loop</title>
+<title>Xinjiang Itinerary</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap">
 <style>
@@ -95,6 +95,8 @@ h1{font-family:'Fraunces',serif;font-weight:600;font-size:clamp(28px,4vw,42px);m
 .detour-box .time{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--accent-gold);background:var(--surface);border-radius:100px;padding:2px 9px;white-space:nowrap;}
 .detour-box .name{font-weight:600;font-size:14.5px;margin:6px 0 3px;}
 .detour-box .desc{font-size:13px;color:var(--ink-dim);margin:0 0 8px;line-height:1.5;}
+.detour-box .body{display:flex;gap:12px;align-items:flex-start;}
+.detour-box .img{width:88px;height:88px;border-radius:9px;object-fit:cover;flex:0 0 auto;background:var(--surface-2);}
 
 .cards{display:flex;flex-direction:column;gap:16px;}
 .card{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:20px 22px;box-shadow:var(--shadow);scroll-margin-top:170px;transition:border-color .25s;}
@@ -107,6 +109,8 @@ h1{font-family:'Fraunces',serif;font-weight:600;font-size:clamp(28px,4vw,42px);m
 .tag.stop{background:var(--surface-2);color:var(--ink-dim);}
 .tag.end{background:var(--ink);color:var(--surface);}
 .card-desc{font-size:14.5px;color:var(--ink-dim);margin:2px 0 16px;line-height:1.55;max-width:62ch;}
+.card-img{width:calc(100% + 44px);margin:-20px -22px 16px;display:block;height:180px;object-fit:cover;border-radius:16px 16px 0 0;background:var(--surface-2);}
+.card-credit{font-size:10.5px;color:var(--ink-dim);margin:-12px 0 14px;opacity:.75;}
 
 .info-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
 @media (max-width:520px){.info-grid{grid-template-columns:1fr;}}
@@ -128,7 +132,7 @@ footer p{font-size:12px;color:var(--ink-dim);line-height:1.6;margin:0 0 6px;max-
   <header class="top">
     <div>
       <p class="eyebrow">Northern Xinjiang &middot; 10-day loop</p>
-      <h1>Junggar Loop</h1>
+      <h1>Xinjiang Itinerary</h1>
       <p class="sub">Urumqi → Altay → Kanas → Sayram Lake → Turpan and back. Route, weather, packing and detour notes for every stop, Oct 6–15.</p>
     </div>
     <div class="legend">
@@ -142,7 +146,7 @@ footer p{font-size:12px;color:var(--ink-dim);line-height:1.6;margin:0 0 6px;max-
     <strong>Add your Google Maps API key to see the map.</strong>
     Open this file and replace <code>YOUR_GOOGLE_MAPS_API_KEY</code> near the bottom with a key from the
     <a href="https://console.cloud.google.com/google/maps-apis/credentials" target="_blank" rel="noopener noreferrer">Google Cloud Console</a>
-    (enable the <strong>Maps JavaScript API</strong>, then restrict the key to your GitHub Pages domain). The rest of the page — day plan, weather, packing, detours — works without it.
+    (enable both the <strong>Maps JavaScript API</strong> and the <strong>Directions API</strong>, then restrict the key to your GitHub Pages domain). The rest of the page — day plan, weather, packing, detours — works without it.
   </div>
 
   <div class="day-strip">
@@ -163,9 +167,15 @@ footer p{font-size:12px;color:var(--ink-dim);line-height:1.6;margin:0 0 6px;max-
           <p class="k">Worth the detour</p>
           <span class="time" id="detourTime"></span>
         </div>
-        <p class="name" id="detourName"></p>
-        <p class="desc" id="detourDesc"></p>
-        <a class="maplink" id="detourMapLink" href="#" target="_blank" rel="noopener noreferrer">View on Google Maps ↗</a>
+        <div class="body">
+          <img class="img" id="detourImg" style="display:none" alt="" loading="lazy">
+          <div>
+            <p class="name" id="detourName"></p>
+            <p class="desc" id="detourDesc"></p>
+            <p class="card-credit" id="detourCredit" style="margin:-6px 0 8px;"></p>
+            <a class="maplink" id="detourMapLink" href="#" target="_blank" rel="noopener noreferrer">View on Google Maps ↗</a>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -173,7 +183,7 @@ footer p{font-size:12px;color:var(--ink-dim);line-height:1.6;margin:0 0 6px;max-
   </div>
 
   <footer>
-    <p><strong>Map:</strong> a live Google Map — pan, zoom and switch to satellite view same as any embedded Google Map. Pins and routes use each stop's real coordinates.</p>
+    <p><strong>Map:</strong> a live Google Map — pan, zoom and switch to satellite view same as any embedded Google Map. Each day's route is the actual driving directions between its stops, not a straight line; muted lines behind it are every other day, for context. Click a pin or a card to select its day — the matching pin turns teal instead of popping up a label.</p>
     <p><strong>Detours:</strong> the gold diamond and dashed line show where a detour sits relative to that day's route; selecting a day zooms the map to fit that day's stops plus the detour, so you can judge the real distance at a glance. Added time is a rough estimate, not a fixed number.</p>
     <p><strong>Weather:</strong> figures are October seasonal averages for each area (high / low, typical conditions), not a live forecast for your travel dates. Recheck closer to departure, especially for Kanas, Hemu, Baihaba and Sayram Lake, where an early cold snap or first snowfall can shift things fast.</p>
   </footer>
@@ -185,6 +195,7 @@ const STOPS = {
   jiangjunshan:{lat:47.8500, lng:88.1500, label:"Jiangjunshan",  gmaps:"Jiangjun Mountain, Altay, Xinjiang, China"},
   altay:       {lat:47.8269, lng:88.1308, label:"Altay",         gmaps:"Altay City, Xinjiang, China"},
   hemu:        {lat:48.7167, lng:87.0167, label:"Hemu",          gmaps:"Hemu Village, Xinjiang, China"},
+  hemubridge:  {lat:48.7140, lng:87.0130, label:"Hemu Bridge",   gmaps:"Hemu Bridge, Hemu Village, Xinjiang, China"},
   baihaba:     {lat:48.9500, lng:86.9800, label:"Baihaba",       gmaps:"Baihaba Village, Xinjiang, China"},
   kanas:       {lat:48.6833, lng:87.0167, label:"Kanas Lake",    gmaps:"Kanas Lake, Xinjiang, China"},
   sanwan:      {lat:48.5967, lng:87.0167, label:"Sanwan",        gmaps:"Kanas Sanwan Three Bays, Xinjiang, China"},
@@ -198,8 +209,6 @@ const STOPS = {
   tuyugou:     {lat:42.9333, lng:89.5167, label:"Tuyu Valley",   gmaps:"Tuyugou Grape Valley, Turpan, Xinjiang, China"},
   shanshan:    {lat:42.8667, lng:90.2167, label:"Shanshan",      gmaps:"Shanshan County, Xinjiang, China"},
 };
-
-const FULL_ROUTE = ["urumqi","jiangjunshan","altay","hemu","baihaba","kanas","sanwan","buerjin","wuerhe","karamay","dushanzi","jinghe","sayram","urumqi","turpan","tuyugou","shanshan","urumqi"];
 
 const DAYS = [
  { day:6, date:"Oct 6", route:["urumqi","jiangjunshan","altay"],
@@ -218,12 +227,15 @@ const DAYS = [
        hi:11, lo:0, cond:"Cold, clear nights; frost likely by morning.",
        wear:["Down or heavy fleece jacket","Thermal base layer","Gloves for evening streets"]},
    ]},
- { day:7, date:"Oct 7", route:["altay","hemu"],
-   title:"Altay–Hemu Highway (Ahe Highway) → Hemu Bridge",
+ { day:7, date:"Oct 7", route:["altay","hemubridge","hemu"],
+   title:"Altay–Hemu Highway (Ahe Highway) → Hemu Bridge → Hemu",
    detour:{name:"Jiadengyu Viewpoint", time:"+10 min", lat:48.05, lng:87.05, anchor:"hemu",
      gmaps:"Jiadengyu Viewpoint, Xinjiang, China",
      desc:"The switchback lookout partway along the Ahe Highway — the classic elevated shot over the valley and river bends, right on the road to Hemu."},
    cards:[
+     {stop:"hemubridge", tag:"stop", title:"Hemu Bridge", desc:"Wooden bridge over the Hemu River at the village entrance — the classic elevated view back over Hemu's rooftops and the valley.",
+       hi:9, lo:-2, cond:"Same crisp mountain air as the village; the riverbank adds a bit of extra chill right at the bridge.",
+       wear:["Down jacket","Warm layers","Waterproof boots"]},
      {stop:"hemu", tag:"stay", title:"Hemu", desc:"Forest village at the foot of the Altay mountains, golden birch and larch season in full swing.",
        hi:9, lo:-2, cond:"Sharp overnight frost; mornings can start below freezing before burning off.",
        wear:["Down jacket","Thermal base + mid layer","Waterproof boots","Gloves and beanie"]},
@@ -343,9 +355,10 @@ const COLOR_MUTED = "#c7b489";
 const COLOR_ACTIVE = "#0e8e83";
 const COLOR_DETOUR = "#a8721c";
 
-let map, fullRoutePolyline, dayRoutePolyline, detourLine, detourMarker;
+let map, directionsService, detourLine, detourMarker;
 const MARKERS = {};
-let infoWindow;
+const DAY_RENDERERS = {};
+const DAY_BOUNDS = {};
 
 function markerIcon(color, scale){
   return { path: google.maps.SymbolPath.CIRCLE, scale: scale || 7, fillColor: color, fillOpacity: 1, strokeColor: "#ffffff", strokeWeight: 2 };
@@ -374,18 +387,8 @@ window.initMap = function(){
     streetViewControl: false,
     fullscreenControl: true,
   });
-  infoWindow = new google.maps.InfoWindow();
+  directionsService = new google.maps.DirectionsService();
 
-  const lineSymbol = { path: "M 0,-1 0,1", strokeOpacity: 1, scale: 3 };
-  fullRoutePolyline = new google.maps.Polyline({
-    path: FULL_ROUTE.map(id => STOPS[id]),
-    strokeOpacity: 0,
-    strokeColor: COLOR_MUTED,
-    icons: [{ icon: lineSymbol, offset: "0", repeat: "16px" }],
-    map,
-  });
-
-  dayRoutePolyline = new google.maps.Polyline({ path: [], strokeColor: COLOR_ACTIVE, strokeOpacity: 0.95, strokeWeight: 5, map });
   detourLine = new google.maps.Polyline({
     path: [], strokeOpacity: 0, strokeColor: COLOR_DETOUR,
     icons: [{ icon: { path: "M 0,-1 0,1", strokeOpacity: 1, scale: 2.5 }, offset: "0", repeat: "10px" }],
@@ -401,8 +404,6 @@ window.initMap = function(){
       zIndex: 10,
     });
     marker.addListener("click", () => {
-      infoWindow.setContent(`<div style="font:600 13px Inter,sans-serif;padding:2px 4px;">${s.label}</div>`);
-      infoWindow.open(map, marker);
       const hostDay = DAYS.find(d => d.route.includes(id));
       if (hostDay) selectDay(hostDay.day, id);
     });
@@ -413,12 +414,60 @@ window.initMap = function(){
   detourMarker = new google.maps.Marker({ map, icon: diamondIcon(COLOR_DETOUR), zIndex: 20 });
   detourMarker.addListener("click", () => {
     const data = DAYS.find(d => d.day === currentDay);
-    infoWindow.setContent(`<div style="font:600 13px Inter,sans-serif;padding:2px 4px;">${data.detour.name}<br><span style="font:11px 'JetBrains Mono',monospace;color:#a8721c;">${data.detour.time}</span></div>`);
-    infoWindow.open(map, detourMarker);
+    window.open(gmapsSearchUrl(data.detour.gmaps), "_blank", "noopener,noreferrer");
   });
+
+  // Fetch a real driving route per day. Each renders muted by default;
+  // selectDay() below promotes the active day's line to the teal accent.
+  DAYS.forEach(fetchDayRoute);
 
   selectDay(currentDay);
 };
+
+function fetchDayRoute(d){
+  const renderer = new google.maps.DirectionsRenderer({
+    map, suppressMarkers: true, preserveViewport: true,
+    polylineOptions: { strokeColor: COLOR_MUTED, strokeOpacity: 0.6, strokeWeight: 3 },
+  });
+  DAY_RENDERERS[d.day] = { obj: renderer, isDirections: true };
+
+  const origin = STOPS[d.route[0]];
+  const destination = STOPS[d.route[d.route.length - 1]];
+  const waypoints = d.route.slice(1, -1).map(id => ({ location: STOPS[id], stopover: true }));
+
+  directionsService.route({ origin, destination, waypoints, travelMode: "DRIVING" }, (result, status) => {
+    if (status === "OK") {
+      renderer.setDirections(result);
+      DAY_BOUNDS[d.day] = result.routes[0].bounds;
+    } else {
+      // no drivable route found for this leg — fall back to a straight line rather than showing nothing
+      renderer.setMap(null);
+      const fallback = new google.maps.Polyline({ path: d.route.map(id => STOPS[id]), map });
+      DAY_RENDERERS[d.day] = { obj: fallback, isDirections: false };
+      console.warn(`Directions failed for Day ${d.day} (${status}); showing a straight line instead.`);
+    }
+    applyRouteStyle(d.day);
+    if (d.day === currentDay) fitDayBounds(d.day);
+  });
+}
+
+function applyRouteStyle(day){
+  const entry = DAY_RENDERERS[day];
+  if (!entry) return;
+  const active = day === currentDay;
+  const style = active
+    ? { strokeColor: COLOR_ACTIVE, strokeOpacity: 0.95, strokeWeight: 5 }
+    : { strokeColor: COLOR_MUTED, strokeOpacity: 0.6, strokeWeight: 3 };
+  entry.isDirections ? entry.obj.setOptions({ polylineOptions: style }) : entry.obj.setOptions(style);
+}
+
+function fitDayBounds(day){
+  const data = DAYS.find(d => d.day === day);
+  const bounds = DAY_BOUNDS[day] ? DAY_BOUNDS[day].clone() : new google.maps.LatLngBounds();
+  if (!DAY_BOUNDS[day]) data.route.forEach(id => bounds.extend(STOPS[id]));
+  bounds.extend({ lat: data.detour.lat, lng: data.detour.lng });
+  map.fitBounds(bounds, 60);
+}
 
 function selectDay(day, scrollToStop){
   currentDay = day;
@@ -434,17 +483,14 @@ function selectDay(day, scrollToStop){
       marker.setZIndex(active ? 15 : 10);
     });
 
-    dayRoutePolyline.setPath(data.route.map(id => STOPS[id]));
+    DAYS.forEach(d => applyRouteStyle(d.day));
 
     const dt = data.detour;
     const anchor = STOPS[dt.anchor];
     detourLine.setPath([anchor, { lat: dt.lat, lng: dt.lng }]);
     detourMarker.setPosition({ lat: dt.lat, lng: dt.lng });
 
-    const bounds = new google.maps.LatLngBounds();
-    data.route.forEach(id => bounds.extend(STOPS[id]));
-    bounds.extend({ lat: dt.lat, lng: dt.lng });
-    map.fitBounds(bounds, 60);
+    fitDayBounds(day);
   }
 
   const dt = data.detour;
@@ -453,8 +499,12 @@ function selectDay(day, scrollToStop){
   document.getElementById("routeMapLink").href = gmapsDirUrl(data.route);
   document.getElementById("detourName").textContent = dt.name;
   document.getElementById("detourDesc").textContent = dt.desc;
+  document.getElementById("detourCredit").textContent = (dt.img && dt.img.credit) || "";
   document.getElementById("detourTime").textContent = dt.time;
   document.getElementById("detourMapLink").href = gmapsSearchUrl(dt.gmaps);
+  const detourImgEl = document.getElementById("detourImg");
+  if (dt.img) { detourImgEl.src = dt.img.url; detourImgEl.alt = dt.name; detourImgEl.style.display = ""; }
+  else { detourImgEl.style.display = "none"; }
 
   const cardsEl = document.getElementById("cards");
   cardsEl.innerHTML = "";
@@ -462,11 +512,14 @@ function selectDay(day, scrollToStop){
     const card = document.createElement("div");
     card.className = "card";
     card.id = `card-${data.day}-${c.stop}`;
+    const stopImg = STOPS[c.stop].img;
     card.innerHTML = `
+      ${stopImg ? `<img class="card-img" src="${stopImg.url}" alt="${c.title}" loading="lazy">` : ""}
       <div class="card-head">
         <p class="card-name">${i+1}. ${c.title}</p>
         <span class="tag ${c.tag}">${c.tag}</span>
       </div>
+      ${stopImg && stopImg.credit ? `<p class="card-credit">${stopImg.credit}</p>` : ""}
       <p class="card-desc">${c.desc}</p>
       <div class="info-grid">
         <div class="block">
