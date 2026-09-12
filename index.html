@@ -400,6 +400,62 @@ const COLOR_MUTED = "#c7b489";
 const COLOR_ACTIVE = "#2563eb";
 const COLOR_DETOUR = "#16a34a";
 
+/* ---- Live weather (Open-Meteo, no key required) ----
+   Open-Meteo only forecasts ~16 days out, so this trip's later dates
+   won't have live data until closer to departure. Each card falls
+   back to the hand-written seasonal average until its date is covered. */
+const WEATHER_YEAR = 2026;
+const LIVE_WEATHER = {}; // stopId -> { "YYYY-MM-DD": {hi, lo, cond} }
+
+function dateToISO(label, year){
+  const months = {Jan:1,Feb:2,Mar:3,Apr:4,May:5,Jun:6,Jul:7,Aug:8,Sep:9,Oct:10,Nov:11,Dec:12};
+  const [mon, day] = label.split(" ");
+  return `${year}-${String(months[mon]).padStart(2,"0")}-${String(parseInt(day,10)).padStart(2,"0")}`;
+}
+
+function weatherCodeText(code){
+  const map = {
+    0:"Clear sky", 1:"Mainly clear", 2:"Partly cloudy", 3:"Overcast",
+    45:"Fog", 48:"Depositing rime fog",
+    51:"Light drizzle", 53:"Drizzle", 55:"Dense drizzle",
+    56:"Freezing drizzle", 57:"Dense freezing drizzle",
+    61:"Slight rain", 63:"Rain", 65:"Heavy rain",
+    66:"Freezing rain", 67:"Heavy freezing rain",
+    71:"Slight snow", 73:"Snow", 75:"Heavy snow", 77:"Snow grains",
+    80:"Slight rain showers", 81:"Rain showers", 82:"Violent rain showers",
+    85:"Slight snow showers", 86:"Heavy snow showers",
+    95:"Thunderstorm", 96:"Thunderstorm with hail", 99:"Thunderstorm with heavy hail",
+  };
+  return map[code] || "Mixed conditions";
+}
+
+function fetchLiveWeather(){
+  const ids = Object.keys(STOPS);
+  const lats = ids.map(id => STOPS[id].lat).join(",");
+  const lngs = ids.map(id => STOPS[id].lng).join(",");
+  const url = `https://api.open-meteo.com/v1/forecast?latitude=${lats}&longitude=${lngs}&daily=temperature_2m_max,temperature_2m_min,weathercode&timezone=auto&forecast_days=16`;
+
+  fetch(url).then(r => r.json()).then(data => {
+    const results = Array.isArray(data) ? data : [data]; // single-location requests aren't wrapped in an array
+    results.forEach((res, i) => {
+      const id = ids[i];
+      if (!res || !res.daily) return;
+      const byDate = {};
+      res.daily.time.forEach((date, j) => {
+        byDate[date] = {
+          hi: Math.round(res.daily.temperature_2m_max[j]),
+          lo: Math.round(res.daily.temperature_2m_min[j]),
+          cond: weatherCodeText(res.daily.weathercode[j]),
+        };
+      });
+      LIVE_WEATHER[id] = byDate;
+    });
+    renderCards(DAYS.find(d => d.day === currentDay)); // refresh with live data, if any of it landed in range
+  }).catch(err => {
+    console.warn("Live weather fetch failed; showing seasonal averages instead.", err);
+  });
+}
+
 let map, directionsService, detourLine, detourMarker;
 const MARKERS = {};
 const DAY_RENDERERS = {};
@@ -530,6 +586,7 @@ function fitDayBounds(day){
 
 function renderCards(data){
   const legs = DAY_LEGS[data.day];
+  const iso = dateToISO(data.date, WEATHER_YEAR);
   const cardsEl = document.getElementById("cards");
   cardsEl.innerHTML = "";
   data.cards.forEach((c, i) => {
@@ -537,6 +594,9 @@ function renderCards(data){
     card.className = "card";
     card.id = `card-${data.day}-${c.stop}`;
     const stopImg = STOPS[c.stop].img;
+    const live = LIVE_WEATHER[c.stop] && LIVE_WEATHER[c.stop][iso];
+    const w = live || { hi: c.hi, lo: c.lo, cond: c.cond };
+    const weatherLabel = live ? "Live forecast" : "Seasonal avg";
     card.innerHTML = `
       ${stopImg ? `<img class="card-img" src="${stopImg.url}" alt="${c.title}" loading="lazy" onerror="this.remove()">` : ""}
       <div class="card-head">
@@ -547,13 +607,13 @@ function renderCards(data){
       <p class="card-desc">${c.desc}</p>
       <div class="info-grid">
         <div class="block">
-          <p class="k">Weather</p>
-          <div class="temps"><span class="hi">${c.hi}°C</span><span class="lo">low ${c.lo}°C</span></div>
-          <p class="cond">${c.cond}</p>
+          <p class="k">${weatherLabel}</p>
+          <div class="temps"><span class="hi">${w.hi}°C</span><span class="lo">low ${w.lo}°C</span></div>
+          <p class="cond">${w.cond}</p>
         </div>
         <div class="block">
           <p class="k">What to wear</p>
-          <ul class="wear-list">${c.wear.map(w => `<li>${w}</li>`).join("")}</ul>
+          <ul class="wear-list">${c.wear.map(item => `<li>${item}</li>`).join("")}</ul>
         </div>
       </div>
       <p class="card-foot"><a class="maplink" href="${gmapsSearchUrl(STOPS[c.stop].gmaps)}" target="_blank" rel="noopener noreferrer">View ${c.title} on Google Maps ↗</a></p>
@@ -634,6 +694,8 @@ function selectDay(day, scrollToStop){
     });
   }
 }
+
+fetchLiveWeather(); // independent of the map — works even without a Maps key
 
 /* ---- Google Maps loader ---- */
 const GOOGLE_MAPS_API_KEY = "AIzaSyBH9tbBtoYUarPTIGQLFiOTqqaonuXpfKw";
