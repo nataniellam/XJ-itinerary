@@ -22,6 +22,8 @@
   --chip-bg:#f1e8d4;
   --warn-bg:#fbe6c8;
   --warn-ink:#5c3a10;
+  --route-active:#2563eb;
+  --route-detour:#16a34a;
 }
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]){
@@ -50,8 +52,8 @@ h1{font-family:'Fraunces',serif;font-weight:600;font-size:clamp(28px,4vw,42px);m
 .legend .item{display:flex;align-items:center;gap:7px;white-space:nowrap;}
 .legend .swatch{width:18px;height:0;border-top:3px solid;border-radius:2px;}
 .legend .swatch.muted{border-top-style:dotted;border-top-color:var(--route-muted);border-top-width:3px;}
-.legend .swatch.active{border-top-color:var(--accent-teal-bright);}
-.legend .diamond{width:9px;height:9px;background:var(--accent-gold);transform:rotate(45deg);border-radius:2px;flex:0 0 auto;}
+.legend .swatch.active{border-top-color:var(--route-active);}
+.legend .diamond{width:9px;height:9px;background:var(--route-detour);transform:rotate(45deg);border-radius:2px;flex:0 0 auto;}
 
 .key-banner{
   display:none;
@@ -110,7 +112,10 @@ h1{font-family:'Fraunces',serif;font-weight:600;font-size:clamp(28px,4vw,42px);m
 .tag.end{background:var(--ink);color:var(--surface);}
 .card-desc{font-size:14.5px;color:var(--ink-dim);margin:2px 0 16px;line-height:1.55;max-width:62ch;}
 .card-img{width:calc(100% + 44px);margin:-20px -22px 16px;display:block;height:180px;object-fit:cover;border-radius:16px 16px 0 0;background:var(--surface-2);}
-.card-credit{font-size:10.5px;color:var(--ink-dim);margin:-12px 0 14px;opacity:.75;}
+.card-credit{display:none;}
+.leg-divider{display:flex;align-items:center;gap:10px;padding:0 6px;color:var(--ink-dim);font-family:'JetBrains Mono',monospace;font-size:11px;}
+.leg-divider .line{flex:1;height:1px;background:var(--line);}
+.leg-divider .txt{white-space:nowrap;}
 
 .info-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
 @media (max-width:520px){.info-grid{grid-template-columns:1fr;}}
@@ -123,7 +128,7 @@ h1{font-family:'Fraunces',serif;font-weight:600;font-size:clamp(28px,4vw,42px);m
 .wear-list li{background:var(--chip-bg);border-radius:100px;padding:6px 12px;font-size:12.5px;color:var(--ink);line-height:1.3;}
 .card-foot{margin-top:14px;}
 
-footer{margin-top:36px;padding-top:18px;border-top:1px solid var(--line);}
+footer{display:none;margin-top:36px;padding-top:18px;border-top:1px solid var(--line);}
 footer p{font-size:12px;color:var(--ink-dim);line-height:1.6;margin:0 0 6px;max-width:75ch;}
 </style>
 </head>
@@ -248,6 +253,9 @@ const DAYS = [
      desc:"The switchback lookout partway along the Ahe Highway — the classic elevated shot over the valley and river bends, right on the road to Hemu.",
      img:{url:"https://upload.wikimedia.org/wikipedia/commons/3/37/%E8%B4%BE%E7%99%BB%E5%B3%AA-%E7%A6%BE%E6%9C%A8%E9%80%94%E4%B8%AD_-_panoramio.jpg", credit:"Photo: neverdance (via Panoramio) / CC BY-SA 3.0, via Wikimedia Commons"}},
    cards:[
+     {stop:"altay", tag:"start", title:"Altay", desc:"Morning departure from Altay before the Ahe Highway drive north.",
+       hi:11, lo:0, cond:"Cold start; the overnight frost should be burning off by mid-morning.",
+       wear:["Down or heavy fleece jacket","Thermal base layer","Gloves for the drive"]},
      {stop:"hemubridge", tag:"stop", title:"Hemu Bridge", desc:"Wooden bridge over the Hemu River at the village entrance — the classic elevated view back over Hemu's rooftops and the valley.",
        hi:9, lo:-2, cond:"Same crisp mountain air as the village; the riverbank adds a bit of extra chill right at the bridge.",
        wear:["Down jacket","Warm layers","Waterproof boots"]},
@@ -261,6 +269,9 @@ const DAYS = [
      gmaps:"China Northwest Corner, Baihaba, Xinjiang, China",
      desc:"A marker near China's northwesternmost point, close to the Kazakhstan–Mongolia tri-border area — a quiet detour before dropping into Baihaba's valley."},
    cards:[
+     {stop:"hemu", tag:"start", title:"Hemu", desc:"Morning departure from Hemu, heading further into the valley toward Baihaba.",
+       hi:9, lo:-2, cond:"Same crisp, frosty mountain air as the night before.",
+       wear:["Down jacket","Thermal layers","Waterproof boots"]},
      {stop:"baihaba", tag:"stay", title:"Baihaba", desc:"Remote Tuvan and Kazakh border village, one of the most isolated stops on the loop.",
        hi:8, lo:-3, cond:"Similar to Hemu, slightly colder overnight — this valley holds cold air.",
        wear:["Down jacket","Thermal layers","Sturdy waterproof boots","Gloves"]},
@@ -271,6 +282,9 @@ const DAYS = [
      gmaps:"Guanyu Pavilion, Kanas Lake, Xinjiang, China",
      desc:"The cable-car platform above Kanas Lake gives the full panorama over the three bays — worth the queue if the morning is clear."},
    cards:[
+     {stop:"baihaba", tag:"start", title:"Baihaba", desc:"Morning departure from Baihaba, heading back south toward Kanas Lake.",
+       hi:8, lo:-3, cond:"Cold valley air lingers into the morning.",
+       wear:["Down jacket","Thermal layers","Sturdy waterproof boots"]},
      {stop:"kanas", tag:"stop", title:"Kanas Lake", desc:"Alpine lake ringed by golden larch — the wind off the water cuts through fast.",
        hi:9, lo:-1, cond:"Cold lakeside wind chill even on a sunny day; glare off the water is strong.",
        wear:["Insulated windproof jacket","Gloves","Sunglasses"]},
@@ -288,6 +302,9 @@ const DAYS = [
      desc:"Eroded rainbow-striped cliffs near Buerjin, best around sunset — a natural stop before the drive out to the yardang fields.",
      img:{url:"https://upload.wikimedia.org/wikipedia/commons/5/5b/Wucaitan.jpg", credit:"Photo: Anh minh / CC BY-SA 3.0, via Wikimedia Commons"}},
    cards:[
+     {stop:"buerjin", tag:"start", title:"Buerjin", desc:"Morning departure from Buerjin before the drive out to the yardang desert.",
+       hi:12, lo:1, cond:"Milder than the mountain stops, but still a cool start.",
+       wear:["Mid-weight jacket","Layers"]},
      {stop:"wuerhe", tag:"stop", title:"World Devil City (Wuerhe)", desc:"Yardang wind-eroded desert landform — famously loud and windy, especially in the afternoon.",
        hi:14, lo:2, cond:"Strong, gritty wind is the defining feature; otherwise dry and sunny.",
        wear:["Windbreaker or shell","Buff or scarf for dust","Sunglasses"]},
@@ -301,6 +318,9 @@ const DAYS = [
      gmaps:"Dushanzi Oil Town, Karamay, Xinjiang, China",
      desc:"A quick stop on the region's oil-boom history, right by the canyon turnoff — five minutes off the main road."},
    cards:[
+     {stop:"karamay", tag:"start", title:"Karamay", desc:"Morning departure from Karamay toward the Dushanzi badlands.",
+       hi:16, lo:3, cond:"Dry and mild, a typical high-desert morning.",
+       wear:["Light jacket","Layers"]},
      {stop:"dushanzi", tag:"stop", title:"Dushanzi Grand Canyon", desc:"Red-rock badland canyon with an exposed rim trail — windier than it looks from the car park.",
        hi:15, lo:2, cond:"Clear and dry; wind gusts along the rim can be sharp.",
        wear:["Windproof jacket","Shoes with good grip","Sun hat"]},
@@ -315,6 +335,9 @@ const DAYS = [
      desc:"A dramatic canyon road on the way up, crossed by one of China's tallest highway bridges — worth slowing down for, not just driving through.",
      img:{url:"https://upload.wikimedia.org/wikipedia/commons/0/0e/Guozigou_Bridge_far_view.jpg", credit:"Photo: Timothytyy / CC BY 4.0, via Wikimedia Commons"}},
    cards:[
+     {stop:"jinghe", tag:"start", title:"Jinghe", desc:"Morning departure from Jinghe, climbing into the Tianshan toward Sayram Lake.",
+       hi:16, lo:2, cond:"Mild in town; expect it to turn much colder at altitude.",
+       wear:["Light-to-medium jacket","A warmer layer you can add"]},
      {stop:"sayram", tag:"stay", title:"Sayram Lake", desc:"High alpine lake at ~2,070m, circled by road today — the coldest, windiest overnight of the trip.",
        hi:10, lo:-3, cond:"Big day/night swing at altitude; wind off the lake adds real chill.",
        wear:["Heavy down jacket","Thermal base + mid layer","Warm hat and gloves","Windproof shell"]},
@@ -340,6 +363,9 @@ const DAYS = [
      desc:"Ruins and the underground irrigation exhibit are minutes from Flame Mountain — the easiest detour of the whole trip to justify.",
      img:{url:"https://upload.wikimedia.org/wikipedia/commons/1/1f/Jiaohe_City%28Yarkhoto%29%2CTurpan%2CXinjiang_HY4.jpg", credit:"Photo: Hiroooooo / CC BY-SA 3.0, via Wikimedia Commons"}},
    cards:[
+     {stop:"urumqi", tag:"start", title:"Urumqi", desc:"Morning departure from Urumqi, heading southeast into the Turpan basin.",
+       hi:15, lo:5, cond:"Mild and dry — expect a big jump in temperature once you drop into the basin.",
+       wear:["Light-medium layers for the drive","Sun hat for later"]},
      {stop:"turpan", tag:"stop", title:"Turpan / Flame Mountain", desc:"Lowest, hottest basin in China — a real jump in temperature after the mountains.",
        hi:24, lo:11, cond:"Warm and dry with strong desert sun; the surface rock runs far hotter than the air.",
        wear:["Light breathable clothing","Sun hat","Sunglasses","Sunscreen"]},
@@ -357,6 +383,9 @@ const DAYS = [
      desc:"If Jiaohe was yesterday's stop, either of these ancient-city sites makes a good last detour before the drive back to Urumqi.",
      img:{url:"https://upload.wikimedia.org/wikipedia/commons/6/68/Astana-view.jpg", credit:"Photo: Otebig / Public domain, via Wikimedia Commons"}},
    cards:[
+     {stop:"shanshan", tag:"start", title:"Shanshan", desc:"Morning departure from Shanshan for the drive back to Urumqi.",
+       hi:22, lo:10, cond:"Warm basin morning; cooler again once back up at Urumqi's elevation.",
+       wear:["Light layers for the morning","Warmer layer for arrival"]},
      {stop:"urumqi", tag:"end", title:"Urumqi", desc:"Back to the mild city climate to close out the loop.",
        hi:14, lo:4, cond:"Cooler than a week ago — October's steady slide toward winter is noticeable by now.",
        wear:["Medium layers","Warm jacket for the evening"]},
@@ -372,13 +401,15 @@ function gmapsSearchUrl(query){
 }
 
 const COLOR_MUTED = "#c7b489";
-const COLOR_ACTIVE = "#0e8e83";
-const COLOR_DETOUR = "#a8721c";
+const COLOR_ACTIVE = "#2563eb";
+const COLOR_DETOUR = "#16a34a";
 
-let map, directionsService, detourLine, detourMarker;
+let map, directionsService, detourLine, detourMarker, detourRenderer;
 const MARKERS = {};
 const DAY_RENDERERS = {};
 const DAY_BOUNDS = {};
+const DAY_LEGS = {};
+let detourRequestToken = 0;
 
 function markerIcon(color, scale){
   return { path: google.maps.SymbolPath.CIRCLE, scale: scale || 7, fillColor: color, fillOpacity: 1, strokeColor: "#ffffff", strokeWeight: 2 };
@@ -413,6 +444,10 @@ window.initMap = function(){
     path: [], strokeOpacity: 0, strokeColor: COLOR_DETOUR,
     icons: [{ icon: { path: "M 0,-1 0,1", strokeOpacity: 1, scale: 2.5 }, offset: "0", repeat: "10px" }],
     map,
+  });
+  detourRenderer = new google.maps.DirectionsRenderer({
+    suppressMarkers: true, preserveViewport: true,
+    polylineOptions: { strokeColor: COLOR_DETOUR, strokeOpacity: 0.9, strokeWeight: 4 },
   });
 
   const bounds = new google.maps.LatLngBounds();
@@ -459,6 +494,8 @@ function fetchDayRoute(d){
     if (status === "OK") {
       renderer.setDirections(result);
       DAY_BOUNDS[d.day] = result.routes[0].bounds;
+      DAY_LEGS[d.day] = result.routes[0].legs.map(l => ({ duration: l.duration.text, distance: l.distance.text }));
+      if (d.day === currentDay) renderCards(d); // refresh drive-time dividers once real leg data lands
     } else {
       // no drivable route found for this leg — fall back to a straight line rather than showing nothing
       renderer.setMap(null);
@@ -500,43 +537,31 @@ function fitDayBounds(day){
   map.fitBounds(bounds, 60);
 }
 
-function selectDay(day, scrollToStop){
-  currentDay = day;
-  const data = DAYS.find(d => d.day === day);
-
-  document.querySelectorAll(".day-btn").forEach(b => b.classList.toggle("active", Number(b.dataset.day) === day));
-
-  if (map) {
-    const activeStops = new Set(data.route);
-    Object.entries(MARKERS).forEach(([id, marker]) => {
-      const active = activeStops.has(id);
-      marker.setIcon(markerIcon(active ? COLOR_ACTIVE : COLOR_MUTED, active ? 8 : 6));
-      marker.setZIndex(active ? 15 : 10);
-    });
-
-    DAYS.forEach(d => applyRouteStyle(d.day));
-
-    const dt = data.detour;
-    const anchor = STOPS[dt.anchor];
-    detourLine.setPath([anchor, { lat: dt.lat, lng: dt.lng }]);
-    detourMarker.setPosition({ lat: dt.lat, lng: dt.lng });
-
-    fitDayBounds(day);
-  }
-
+function fetchDetourRoute(data){
+  const token = ++detourRequestToken;
   const dt = data.detour;
-  document.getElementById("routeLabelDay").innerHTML = `<b>Day ${data.day}</b> &middot; ${data.date}`;
-  document.getElementById("routeTitle").textContent = data.title;
-  document.getElementById("routeMapLink").href = gmapsDirUrl(data.route);
-  document.getElementById("detourName").textContent = dt.name;
-  document.getElementById("detourDesc").textContent = dt.desc;
-  document.getElementById("detourCredit").textContent = (dt.img && dt.img.credit) || "";
-  document.getElementById("detourTime").textContent = dt.time;
-  document.getElementById("detourMapLink").href = gmapsSearchUrl(dt.gmaps);
-  const detourImgEl = document.getElementById("detourImg");
-  if (dt.img) { detourImgEl.src = dt.img.url; detourImgEl.alt = dt.name; detourImgEl.style.display = ""; }
-  else { detourImgEl.style.display = "none"; }
+  const anchor = STOPS[dt.anchor];
+  const destination = { lat: dt.lat, lng: dt.lng };
 
+  directionsService.route({ origin: anchor, destination, travelMode: "DRIVING" }, (result, status) => {
+    if (token !== detourRequestToken) return; // a newer day was selected before this resolved
+    if (status === "OK") {
+      detourRenderer.setDirections(result);
+      detourRenderer.setMap(map);
+      detourLine.setMap(null);
+      const leg = result.routes[0].legs[0];
+      document.getElementById("detourTime").textContent = `${leg.duration.text} · ${leg.distance.text}`;
+    } else {
+      detourRenderer.setMap(null);
+      detourLine.setPath([anchor, destination]);
+      detourLine.setMap(map);
+      document.getElementById("detourTime").textContent = dt.time; // fall back to the hand estimate
+    }
+  });
+}
+
+function renderCards(data){
+  const legs = DAY_LEGS[data.day];
   const cardsEl = document.getElementById("cards");
   cardsEl.innerHTML = "";
   data.cards.forEach((c, i) => {
@@ -570,7 +595,52 @@ function selectDay(day, scrollToStop){
       if (map && MARKERS[c.stop]) { map.panTo(MARKERS[c.stop].getPosition()); google.maps.event.trigger(MARKERS[c.stop], "click"); }
     });
     cardsEl.appendChild(card);
+
+    const leg = legs && legs[i];
+    if (leg && i < data.cards.length - 1) {
+      const divider = document.createElement("div");
+      divider.className = "leg-divider";
+      divider.innerHTML = `<span class="line"></span><span class="txt">🚗 ${leg.duration} · ${leg.distance}</span><span class="line"></span>`;
+      cardsEl.appendChild(divider);
+    }
   });
+}
+
+function selectDay(day, scrollToStop){
+  currentDay = day;
+  const data = DAYS.find(d => d.day === day);
+
+  document.querySelectorAll(".day-btn").forEach(b => b.classList.toggle("active", Number(b.dataset.day) === day));
+
+  if (map) {
+    Object.entries(MARKERS).forEach(([id, marker]) => {
+      const idx = data.route.indexOf(id);
+      const active = idx !== -1;
+      marker.setIcon(markerIcon(active ? COLOR_ACTIVE : COLOR_MUTED, active ? 10 : 6));
+      marker.setZIndex(active ? 15 : 10);
+      marker.setLabel(active ? { text: String(idx + 1), color: "#ffffff", fontSize: "11px", fontWeight: "700" } : null);
+    });
+
+    DAYS.forEach(d => applyRouteStyle(d.day));
+    detourMarker.setPosition({ lat: data.detour.lat, lng: data.detour.lng });
+    fetchDetourRoute(data);
+    fitDayBounds(day);
+  }
+
+  const dt = data.detour;
+  document.getElementById("routeLabelDay").innerHTML = `<b>Day ${data.day}</b> &middot; ${data.date}`;
+  document.getElementById("routeTitle").textContent = data.title;
+  document.getElementById("routeMapLink").href = gmapsDirUrl(data.route);
+  document.getElementById("detourName").textContent = dt.name;
+  document.getElementById("detourDesc").textContent = dt.desc;
+  document.getElementById("detourCredit").textContent = (dt.img && dt.img.credit) || "";
+  document.getElementById("detourTime").textContent = dt.time; // replaced with a real duration once routed, if possible
+  document.getElementById("detourMapLink").href = gmapsSearchUrl(dt.gmaps);
+  const detourImgEl = document.getElementById("detourImg");
+  if (dt.img) { detourImgEl.src = dt.img.url; detourImgEl.alt = dt.name; detourImgEl.style.display = ""; }
+  else { detourImgEl.style.display = "none"; }
+
+  renderCards(data);
 
   if (scrollToStop) {
     requestAnimationFrame(() => {
