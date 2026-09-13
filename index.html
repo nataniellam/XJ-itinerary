@@ -130,6 +130,23 @@ h1{font-family:'Fraunces',serif;font-weight:600;font-size:clamp(28px,4vw,42px);m
 .wear-list li{background:var(--chip-bg);border-radius:100px;padding:6px 12px;font-size:12.5px;color:var(--ink);line-height:1.3;}
 .card-foot{margin-top:14px;}
 
+.flight-card .card-desc{margin-bottom:14px;}
+.flight-legs{display:flex;flex-direction:column;}
+.flight-leg{display:flex;align-items:center;gap:14px;}
+.fl-endpoint{display:flex;flex-direction:column;min-width:0;flex:0 0 auto;}
+.fl-endpoint .fl-time{font-family:'JetBrains Mono',monospace;font-size:19px;font-weight:700;color:var(--ink);font-variant-numeric:tabular-nums;}
+.fl-endpoint .fl-time small{font-size:10px;font-weight:600;color:var(--accent-gold);}
+.fl-endpoint .fl-code{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--accent-teal-bright);font-weight:700;letter-spacing:.04em;}
+.fl-endpoint .fl-name{font-size:11px;color:var(--ink-dim);}
+.fl-mid{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;min-width:60px;}
+.fl-mid .fl-dur{font-family:'JetBrains Mono',monospace;font-size:10.5px;color:var(--ink-dim);white-space:nowrap;}
+.fl-mid .fl-line{width:100%;height:1px;background:var(--line);}
+.fl-meta{font-size:12px;color:var(--ink-dim);margin:6px 0 16px;}
+.fl-transfer{
+  font-family:'JetBrains Mono',monospace;font-size:11.5px;color:var(--accent-gold);
+  background:var(--chip-bg);border-radius:8px;padding:6px 12px;margin:0 0 16px;display:inline-block;
+}
+
 footer{display:none;margin-top:36px;padding-top:18px;border-top:1px solid var(--line);}
 footer p{font-size:12px;color:var(--ink-dim);line-height:1.6;margin:0 0 6px;max-width:75ch;}
 </style>
@@ -232,6 +249,25 @@ const STOPS = {
 };
 
 const DAYS = [
+ { day:0, date:"Oct 5", route:["urumqi"],
+   title:"Arrive in Urumqi",
+   flight:{
+     title:"Singapore → Urumqi", tagLabel:"ARRIVE", tagClass:"start",
+     legs:[
+       {airline:"China Southern Airlines", flightNo:"CZ8490", aircraft:"Airbus A321-200 (Mid-sized)", meal:"Meal",
+        depCode:"SIN", depName:"Singapore Changi T1", depTime:"04:10",
+        arrCode:"CAN", arrName:"Guangzhou Baiyun Intl. T2", arrTime:"08:15", duration:"4h 5m"},
+       {airline:"China Southern Airlines", flightNo:"CZ6882", aircraft:"Boeing 737-800 (Mid-sized)", meal:"Meal",
+        depCode:"CAN", depName:"Guangzhou Baiyun Intl. T2", depTime:"10:00",
+        arrCode:"URC", arrName:"Urumqi Tianshan Intl.", arrTime:"15:20", duration:"5h 20m"},
+     ],
+     transfers:[{location:"Guangzhou", duration:"1h 45m"}],
+   },
+   cards:[
+     {stop:"urumqi", tag:"start", title:"Urumqi", desc:"Land at Urumqi Tianshan International in the afternoon after transferring through Guangzhou. Transfer to the hotel and rest up — Day 1's early start up the S21 desert highway begins tomorrow.",
+       hi:15, lo:5, cond:"Mild early-October afternoon; noticeably milder than the mountains still to come.",
+       wear:["T-shirt","Sweaters/Fleeces"]},
+   ]},
  { day:1, date:"Oct 6", route:["urumqi","jiangjunshan","altay"],
    title:"Urumqi → S21 Desert Highway → Jiangjunshan Sunset → Altay",
    detour:{name:"Ulungur Lake, Fuhai", time:"+45 min", lat:47.05, lng:87.40, anchor:"jiangjunshan",
@@ -241,7 +277,7 @@ const DAYS = [
    cards:[
      {stop:"urumqi", tag:"start", title:"Urumqi", desc:"Trip departure from Xinjiang's capital. Grab any last-minute supplies or a proper coffee before the long desert-highway push north — this is the last big city until the loop swings back through in a week.",
        hi:15, lo:5, cond:"Dry and mostly clear; the day/night gap widens fast this month.",
-       wear:["Sweaters/Fleeces","Windproof shell"]},
+       wear:["T-shirt","Sweaters/Fleeces","Windproof shell"]},
      {stop:"jiangjunshan", tag:"stop", title:"Jiangjunshan (General's Mountain)", desc:"A hilltop park and ski resort on the edge of Altay, best known for sweeping views back over the S21 desert highway. Exposed and unshielded from the wind, so the golden hour here comes with a real chill.",
        hi:9, lo:-1, cond:"Clear but windy; apparent temperature drops sharply once the sun is low.",
        wear:["Heattech","Down Jacket","Windproof shell"]},
@@ -307,10 +343,10 @@ const DAYS = [
        wear:["Heattech","Sweaters/Fleeces"]},
      {stop:"wuerhe", tag:"stop", title:"World Devil City (Wuerhe)", desc:"A yardang field carved by relentless wind into castle-like ridges and towers — hence \"ghost city.\" The wind itself is part of the experience, said to howl through the rock formations after dark.",
        hi:14, lo:2, cond:"Strong, gritty wind is the defining feature; otherwise dry and sunny.",
-       wear:["Sweaters/Fleeces","Windproof shell"]},
+       wear:["T-shirt","Sweaters/Fleeces","Windproof shell"]},
      {stop:"karamay", tag:"stay", title:"Karamay", desc:"Xinjiang's purpose-built oil city, laid out in the 1950s around China's first major oilfield. Broad boulevards and fountains give it a different feel from anywhere else on the loop.",
        hi:16, lo:3, cond:"Dry, mild, still breezy after dark.",
-       wear:["Sweaters/Fleeces","Windproof shell"]},
+       wear:["T-shirt","Sweaters/Fleeces","Windproof shell"]},
    ]},
  { day:6, date:"Oct 11", route:["karamay","dushanzi","jinghe"],
    title:"Karamay → Dushanzi Grand Canyon → Jinghe",
@@ -320,13 +356,13 @@ const DAYS = [
    cards:[
      {stop:"karamay", tag:"start", title:"Karamay", desc:"Morning departure from Karamay, heading south toward the Tianshan foothills.",
        hi:16, lo:3, cond:"Dry and mild, a typical high-desert morning.",
-       wear:["Sweaters/Fleeces","Windproof shell"]},
+       wear:["T-shirt","Sweaters/Fleeces","Windproof shell"]},
      {stop:"dushanzi", tag:"stop", title:"Dushanzi Grand Canyon", desc:"A red-and-grey badland canyon cut by the Kuitun River, with a rim boardwalk that traces the edge for sweeping views straight down into the eroded folds of rock.",
        hi:15, lo:2, cond:"Clear and dry; wind gusts along the rim can be sharp.",
-       wear:["Sweaters/Fleeces","Windproof shell"]},
+       wear:["T-shirt","Sweaters/Fleeces","Windproof shell"]},
      {stop:"jinghe", tag:"stay", title:"Jinghe", desc:"A low-key transit county at the base of the mountains, mainly useful as a staging point before the climb up to Sayram Lake the next morning.",
        hi:16, lo:2, cond:"Mild and dry, similar to Karamay.",
-       wear:["Sweaters/Fleeces","Windproof shell"]},
+       wear:["T-shirt","Sweaters/Fleeces","Windproof shell"]},
    ]},
  { day:7, date:"Oct 12", route:["jinghe","sayram"],
    title:"Jinghe → Circumnavigation of Sayram Lake",
@@ -337,7 +373,7 @@ const DAYS = [
    cards:[
      {stop:"jinghe", tag:"start", title:"Jinghe", desc:"Morning departure from Jinghe, climbing quickly into the Tianshan range toward Sayram Lake.",
        hi:16, lo:2, cond:"Mild in town; expect it to turn much colder at altitude.",
-       wear:["Sweaters/Fleeces","Windproof shell"]},
+       wear:["T-shirt","Sweaters/Fleeces","Windproof shell"]},
      {stop:"sayram", tag:"stay", title:"Sayram Lake", desc:"China's largest alpine lake by area, often called the \"Tear of the Atlantic\" as it's the last place moisture from that ocean reaches before the interior deserts. The full loop road around it takes a couple of hours with stops.",
        hi:10, lo:-3, cond:"Big day/night swing at altitude; wind off the lake adds real chill.",
        wear:["Heattech","Down Jacket","Windproof shell"]},
@@ -354,7 +390,7 @@ const DAYS = [
        wear:["Heattech","Down Jacket","Windproof shell"]},
      {stop:"urumqi", tag:"stay", title:"Urumqi", desc:"Back to the capital for a night of proper city comforts — hot showers, restaurant food, and a chance to dry out any gear from the last few damp mountain mornings.",
        hi:15, lo:5, cond:"Mild by comparison — dry with a clear evening.",
-       wear:["Sweaters/Fleeces"]},
+       wear:["T-shirt","Sweaters/Fleeces"]},
    ]},
  { day:9, date:"Oct 14", route:["urumqi","turpan","tuyugou","shanshan"],
    title:"Urumqi → Turpan Flame Mountain → Tuyu Valley → Shanshan",
@@ -364,16 +400,16 @@ const DAYS = [
    cards:[
      {stop:"urumqi", tag:"start", title:"Urumqi", desc:"Morning departure from Urumqi, dropping down out of the mountains into the Turpan Depression, one of the hottest and lowest points in China.",
        hi:15, lo:5, cond:"Mild and dry — expect a big jump in temperature once you drop into the basin.",
-       wear:["Sweaters/Fleeces","Windproof shell"]},
+       wear:["T-shirt","Sweaters/Fleeces","Windproof shell"]},
      {stop:"turpan", tag:"stop", title:"Turpan / Flame Mountain", desc:"Bare red sandstone hills that appear to ripple like flame in the midday sun, said to have inspired a scene in Journey to the West. The rock surface runs far hotter than the air — worth touching briefly, not lingering on.",
        hi:24, lo:11, cond:"Warm and dry with strong desert sun; the surface rock runs far hotter than the air.",
-       wear:["Sweaters/Fleeces"]},
+       wear:["T-shirt","Sweaters/Fleeces"]},
      {stop:"tuyugou", tag:"stop", title:"Tuyu Valley", desc:"A green, spring-fed gorge cutting through the Flame Mountains, lined with grape trellises and a centuries-old Uyghur village built into the slope. A shaded, cooler contrast to the open desert around it.",
        hi:23, lo:11, cond:"Still warm; shade in the gorge is a welcome break from the open desert.",
-       wear:["Sweaters/Fleeces"]},
+       wear:["T-shirt","Sweaters/Fleeces"]},
      {stop:"shanshan", tag:"stay", title:"Shanshan", desc:"A basin town known for its melons and, more recently, the dunes just outside it — an easy overnight before the last drive back to Urumqi.",
        hi:22, lo:10, cond:"Warm days, a fast cool-down after dark — bring one layer back out for dinner.",
-       wear:["Sweaters/Fleeces"]},
+       wear:["T-shirt","Sweaters/Fleeces"]},
    ]},
  { day:10, date:"Oct 15", route:["shanshan","urumqi"],
    title:"Shanshan → Urumqi (trip end)",
@@ -384,9 +420,28 @@ const DAYS = [
    cards:[
      {stop:"shanshan", tag:"start", title:"Shanshan", desc:"Morning departure from Shanshan for the return drive to Urumqi, closing the loop.",
        hi:22, lo:10, cond:"Warm basin morning; cooler again once back up at Urumqi's elevation.",
-       wear:["Sweaters/Fleeces"]},
+       wear:["T-shirt","Sweaters/Fleeces"]},
      {stop:"urumqi", tag:"end", title:"Urumqi", desc:"Back to the capital to close out the ten-day loop — a fittingly mild bookend after a trip that ran from desert heat to alpine frost.",
        hi:14, lo:4, cond:"Cooler than a week ago — October's steady slide toward winter is noticeable by now.",
+       wear:["T-shirt","Sweaters/Fleeces","Windproof shell"]},
+   ]},
+ { day:11, date:"Oct 16", route:["urumqi"],
+   title:"Depart Urumqi",
+   flight:{
+     title:"Urumqi → Singapore", tagLabel:"RETURN", tagClass:"end",
+     legs:[
+       {airline:"China Southern Airlines", flightNo:"CZ6885", aircraft:"Boeing 737 (Mid-sized)", meal:"Meal",
+        depCode:"URC", depName:"Urumqi Tianshan Intl.", depTime:"14:45",
+        arrCode:"CAN", arrName:"Guangzhou Baiyun Intl. T2", arrTime:"20:10", duration:"5h 25m"},
+       {airline:"China Southern Airlines", flightNo:"CZ8489", aircraft:"Airbus A321-200 (Mid-sized)", meal:"Snacks",
+        depCode:"CAN", depName:"Guangzhou Baiyun Intl. T2", depTime:"23:05",
+        arrCode:"SIN", arrName:"Singapore Changi T1", arrTime:"03:05", arrNote:"+1 day (Oct 17)", duration:"4h 0m"},
+     ],
+     transfers:[{location:"Guangzhou", duration:"2h 55m"}],
+   },
+   cards:[
+     {stop:"urumqi", tag:"end", title:"Urumqi", desc:"A free morning before an early-afternoon departure — last-minute shopping at the Grand Bazaar or a final bowl of noodles before heading to the airport for the flight home via Guangzhou.",
+       hi:13, lo:3, cond:"Cooling further as October goes on; keep a warm layer handy for the airport.",
        wear:["Sweaters/Fleeces","Windproof shell"]},
    ]},
 ];
@@ -519,7 +574,7 @@ DAYS.forEach(d => {
   dayScroll.appendChild(b);
 });
 
-let currentDay = DAYS[0].day;
+let currentDay = 1; // open on the first driving day, not the Day 0 arrival bookend
 
 window.initMap = function(){
   map = new google.maps.Map(document.getElementById("map"), {
@@ -561,6 +616,8 @@ window.initMap = function(){
 };
 
 function fetchDayRoute(d){
+  if (d.route.length < 2) return; // a single-point day (arrival/departure) has no line to draw
+
   const renderer = new google.maps.DirectionsRenderer({
     map, suppressMarkers: true, preserveViewport: true,
     polylineOptions: { strokeColor: COLOR_MUTED, strokeOpacity: 0.6, strokeWeight: 3 },
@@ -616,6 +673,47 @@ function fitDayBounds(day){
   else data.route.forEach(id => bounds.extend(STOPS[id]));
   if (data.detour) bounds.extend({ lat: data.detour.lat, lng: data.detour.lng });
   map.fitBounds(bounds, 60);
+  if (data.route.length + (data.detour ? 1 : 0) <= 1) {
+    // fitBounds zooms in absurdly close on a single point — settle on a sane city-level zoom instead
+    google.maps.event.addListenerOnce(map, "bounds_changed", () => map.setZoom(11));
+  }
+}
+
+function flightLegHTML(leg){
+  return `
+    <div class="flight-leg">
+      <div class="fl-endpoint">
+        <span class="fl-time">${leg.depTime}</span>
+        <span class="fl-code">${leg.depCode}</span>
+        <span class="fl-name">${leg.depName}</span>
+      </div>
+      <div class="fl-mid"><span class="fl-dur">${leg.duration}</span><span class="fl-line"></span></div>
+      <div class="fl-endpoint">
+        <span class="fl-time">${leg.arrTime}${leg.arrNote ? ` <small>${leg.arrNote}</small>` : ""}</span>
+        <span class="fl-code">${leg.arrCode}</span>
+        <span class="fl-name">${leg.arrName}</span>
+      </div>
+    </div>
+    <p class="fl-meta">${leg.airline} ${leg.flightNo} · ${leg.aircraft} · ${leg.meal}</p>
+  `;
+}
+
+function renderFlightCard(flight){
+  const card = document.createElement("div");
+  card.className = "card flight-card";
+  const rows = flight.legs.map((leg, i) => {
+    const transfer = flight.transfers[i];
+    return flightLegHTML(leg) + (transfer ? `<div class="fl-transfer">Transfer in ${transfer.location} · ${transfer.duration}</div>` : "");
+  }).join("");
+  card.innerHTML = `
+    <div class="card-head">
+      <p class="card-name">✈ ${flight.title}</p>
+      <span class="tag ${flight.tagClass}">${flight.tagLabel}</span>
+    </div>
+    <p class="card-desc">All times shown are local time at each airport.</p>
+    <div class="flight-legs">${rows}</div>
+  `;
+  return card;
 }
 
 function renderCards(data){
@@ -623,6 +721,7 @@ function renderCards(data){
   const iso = dateToISO(data.date, WEATHER_YEAR);
   const cardsEl = document.getElementById("cards");
   cardsEl.innerHTML = "";
+  if (data.flight) cardsEl.appendChild(renderFlightCard(data.flight));
   data.cards.forEach((c, i) => {
     const card = document.createElement("div");
     card.className = "card";
