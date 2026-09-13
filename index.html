@@ -427,6 +427,7 @@ const DAYS = [
    ]},
  { day:11, date:"Oct 16", route:["urumqi"],
    title:"Depart Urumqi",
+   flightAfterCards:true,
    flight:{
      title:"Urumqi → Singapore", tagLabel:"RETURN", tagClass:"end",
      legs:[
@@ -721,7 +722,7 @@ function renderCards(data){
   const iso = dateToISO(data.date, WEATHER_YEAR);
   const cardsEl = document.getElementById("cards");
   cardsEl.innerHTML = "";
-  if (data.flight) cardsEl.appendChild(renderFlightCard(data.flight));
+  if (data.flight && !data.flightAfterCards) cardsEl.appendChild(renderFlightCard(data.flight));
   data.cards.forEach((c, i) => {
     const card = document.createElement("div");
     card.className = "card";
@@ -765,6 +766,7 @@ function renderCards(data){
       cardsEl.appendChild(divider);
     }
   });
+  if (data.flight && data.flightAfterCards) cardsEl.appendChild(renderFlightCard(data.flight));
 }
 
 function selectDay(day, scrollToStop){
