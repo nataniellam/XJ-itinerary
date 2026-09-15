@@ -24,6 +24,9 @@
   --warn-ink:#5c3a10;
   --route-active:#2563eb;
   --route-detour:#16a34a;
+  --detour-bg:#e6f4ea;
+  --placeholder-a:#ece2cc;
+  --placeholder-b:#e0d3b0;
 }
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]){
@@ -31,6 +34,7 @@
     --line:#2c3540; --accent-gold:#dda956; --accent-teal:#3fb8ac; --accent-teal-bright:#57e0d1;
     --route-muted:#3c4552; --shadow:0 1px 2px rgba(0,0,0,.3), 0 12px 28px rgba(0,0,0,.45);
     --chip-bg:#232b35; --warn-bg:#3a2c15; --warn-ink:#f0c98a;
+    --detour-bg:#152a1c; --placeholder-a:#212933; --placeholder-b:#2a3340;
   }
 }
 :root[data-theme="dark"]{
@@ -38,6 +42,7 @@
   --line:#2c3540; --accent-gold:#dda956; --accent-teal:#3fb8ac; --accent-teal-bright:#57e0d1;
   --route-muted:#3c4552; --shadow:0 1px 2px rgba(0,0,0,.3), 0 12px 28px rgba(0,0,0,.45);
   --chip-bg:#232b35; --warn-bg:#3a2c15; --warn-ink:#f0c98a;
+  --detour-bg:#152a1c; --placeholder-a:#212933; --placeholder-b:#2a3340;
 }
 
 *{box-sizing:border-box;}
@@ -66,6 +71,9 @@ h1{font-family:'Fraunces',serif;font-weight:600;font-size:clamp(28px,4vw,42px);m
 .key-banner a{color:inherit;}
 
 .day-strip{position:sticky;top:0;z-index:5;background:var(--bg);padding:14px 0 10px;margin-bottom:18px;border-bottom:1px solid var(--line);}
+.day-strip::before,.day-strip::after{content:"";position:absolute;top:14px;bottom:10px;width:28px;pointer-events:none;z-index:1;}
+.day-strip::before{left:0;background:linear-gradient(to right, var(--bg), transparent);}
+.day-strip::after{right:0;background:linear-gradient(to left, var(--bg), transparent);}
 .day-scroll{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;scrollbar-width:thin;}
 .day-scroll::-webkit-scrollbar{height:6px;}
 .day-scroll::-webkit-scrollbar-thumb{background:var(--line);border-radius:4px;}
@@ -93,10 +101,10 @@ h1{font-family:'Fraunces',serif;font-weight:600;font-size:clamp(28px,4vw,42px);m
 
 #map{width:100%;height:440px;border-radius:10px;margin-top:8px;background:var(--surface-2);}
 
-.detour-box{margin-top:14px;background:var(--chip-bg);border:1px dashed var(--accent-gold);border-radius:12px;padding:12px 14px;}
+.detour-box{margin-top:14px;background:var(--detour-bg);border:1px dashed var(--route-detour);border-radius:12px;padding:12px 14px;}
 .detour-box .row{display:flex;justify-content:space-between;align-items:baseline;gap:8px;}
-.detour-box .k{font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--accent-gold);font-weight:600;margin:0 0 4px;}
-.detour-box .time{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--accent-gold);background:var(--surface);border-radius:100px;padding:2px 9px;white-space:nowrap;}
+.detour-box .k{font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--route-detour);font-weight:600;margin:0 0 4px;}
+.detour-box .time{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--route-detour);background:var(--surface);border-radius:100px;padding:2px 9px;white-space:nowrap;}
 .detour-box .name{font-weight:600;font-size:14.5px;margin:6px 0 3px;}
 .detour-box .desc{font-size:13px;color:var(--ink-dim);margin:0 0 8px;line-height:1.5;}
 .detour-box .body{display:flex;gap:12px;align-items:flex-start;}
@@ -114,6 +122,10 @@ h1{font-family:'Fraunces',serif;font-weight:600;font-size:clamp(28px,4vw,42px);m
 .tag.end{background:var(--ink);color:var(--surface);}
 .card-desc{font-size:14.5px;color:var(--ink-dim);margin:2px 0 16px;line-height:1.55;max-width:62ch;}
 .card-img{width:calc(100% + 44px);margin:-20px -22px 16px;display:block;height:180px;object-fit:cover;border-radius:16px 16px 0 0;background:var(--surface-2);}
+.card-img-placeholder{
+  width:calc(100% + 44px);margin:-20px -22px 16px;height:64px;border-radius:16px 16px 0 0;
+  background:repeating-linear-gradient(135deg, var(--placeholder-a) 0 14px, var(--placeholder-b) 14px 28px);
+}
 .card-credit{display:none;}
 .leg-divider{display:flex;align-items:center;gap:10px;padding:0 6px;color:var(--ink-dim);font-family:'JetBrains Mono',monospace;font-size:11px;}
 .leg-divider .line{flex:1;height:1px;background:var(--line);}
@@ -732,7 +744,7 @@ function renderCards(data){
     const w = live || { hi: c.hi, lo: c.lo, cond: c.cond };
     const weatherLabel = live ? "Live forecast" : "Seasonal avg";
     card.innerHTML = `
-      ${stopImg ? `<img class="card-img" src="${stopImg.url}" alt="${c.title}" loading="lazy" onerror="this.remove()">` : ""}
+      ${stopImg ? `<img class="card-img" src="${stopImg.url}" alt="${c.title}" loading="lazy" onerror="this.replaceWith(Object.assign(document.createElement('div'),{className:'card-img-placeholder'}))">` : `<div class="card-img-placeholder"></div>`}
       <div class="card-head">
         <p class="card-name">${i+1}. ${c.title}</p>
         <span class="tag ${c.tag}">${c.tag}</span>
